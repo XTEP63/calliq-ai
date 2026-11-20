@@ -17,7 +17,7 @@ from src.services.session import visible_analyses
 from src.storage.sqlite import Store
 from src.transcription.manual import parse_manual_transcript
 
-st.set_page_config(page_title="CallIQ | Every Call Counts", page_icon="◉", layout="wide")
+st.set_page_config(page_title="CallIQ | Every Call Counts", page_icon="◉", layout="wide", initial_sidebar_state="auto")
 
 for secret_name in ("DEEPGRAM_API_KEY", "GROQ_API_KEY", "TRANSCRIPTION_PROVIDER", "LLM_PROVIDER", "GROQ_MODEL"):
     try:
@@ -27,94 +27,140 @@ for secret_name in ("DEEPGRAM_API_KEY", "GROQ_API_KEY", "TRANSCRIPTION_PROVIDER"
         pass
 
 st.markdown("""<style>
-.block-container{padding-top:1.5rem;max-width:1240px;padding-bottom:4rem}
-.hero{padding:38px 42px;border-radius:22px;background:radial-gradient(circle at 85% 20%,#147486 0%,#0d354a 38%,#0b2031 78%);margin-bottom:26px;border:1px solid #246075}
-.hero h1{margin:0;color:#fff;font-size:3rem;letter-spacing:-.035em}.hero p{color:#ccebf0;font-size:1.15rem;margin:8px 0 0}
-.eyebrow{color:#7ce8ec;font-size:.75rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
-.guide{border-left:3px solid #22c7cb;padding:10px 0 10px 18px;margin:14px 0 26px;color:#d8edf2}
-.quiet{color:#a8bdca;font-size:.9rem}.step{color:#7ce8ec;font-weight:800;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}
-div[data-testid="stMetric"]{border:1px solid #284358;border-radius:14px;padding:15px 18px;background:#11253a}
-div[data-testid="stMetricLabel"]{font-weight:650}div[data-testid="stMetricValue"]{color:#e9fbfd}
-div[data-testid="stExpander"]{border-color:#2b475b;border-radius:12px}
-div[data-testid="stSidebar"]{border-right:1px solid #223d50}
+.block-container{padding-top:1.3rem;max-width:1240px;padding-bottom:4rem}
+.hero{padding:22px 30px;border-radius:18px;background:linear-gradient(115deg,#102B4F 0%,#14365B 72%,#1B416B 100%);margin-bottom:22px;border:1px solid #305476}
+.hero h1{margin:1px 0 0;color:#F5F3EE;font-size:2.1rem;letter-spacing:-.035em}.hero p{color:#D5DFE8;font-size:1rem;margin:3px 0 0}
+.eyebrow{color:#F07842;font-size:.72rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+.guide{border-left:3px solid #F07842;padding:8px 0 8px 17px;margin:12px 0 22px;color:#D5DFE8}
+.step{color:#F07842;font-weight:800;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}
+.role-strip{background:#F5F3EE;color:#07182F;border-radius:16px;padding:22px 26px;margin:18px 0 26px}
+.role-strip h3{color:#07182F;font-size:1.25rem;margin:0 0 16px}.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.role-grid strong{display:block;color:#102B4F;margin-bottom:5px}.role-grid span{display:block;line-height:1.45}
+div[data-testid="stMetric"]{border:1px solid #305476;border-radius:14px;padding:15px 18px;background:#102B4F}
+div[data-testid="stMetricLabel"]{font-weight:650}div[data-testid="stMetricValue"]{color:#F5F3EE}
+div[data-testid="stExpander"]{border-color:#305476;border-radius:12px}
+div[data-testid="stSidebar"]{border-right:1px solid #305476}
+div[data-testid="stSidebar"] div[data-testid="stButton"] button{justify-content:flex-start}
+@media(max-width:700px){.hero{padding:18px 20px}.hero h1{font-size:1.8rem}.block-container{padding-top:2rem}.role-grid{grid-template-columns:1fr;gap:14px}}
 </style>""", unsafe_allow_html=True)
 
 store = Store(os.getenv("CALLIQ_DB_PATH", "data/calliq.sqlite3"))
 seed_demo(store)
 all_calls = visible_analyses(store.list(), st.session_state.get("session_analyses", {}))
 
-st.markdown('<div class="hero"><span class="eyebrow">CONTACT CENTER INTELLIGENCE</span><h1>CallIQ</h1><p>Every Call Counts. Every Insight Matters.</p></div>', unsafe_allow_html=True)
-st.sidebar.markdown("### CallIQ workspace")
-st.sidebar.caption("Explore a ready-made case or analyze a public sample live.")
+def go_to(destination: str, analysis_tab: str | None = None) -> None:
+    st.session_state["active_page"] = destination
+    if analysis_tab:
+        st.session_state["analysis_tab_target"] = analysis_tab
+        st.session_state["analysis_tab_version"] = st.session_state.get("analysis_tab_version", 0) + 1
 
-page = st.sidebar.radio("Workspace", ["Overview", "Analyze Call", "Agent Dashboard", "Manager Dashboard", "QA Analyst", "Performance Reports", "Architecture & About"])
+
+page = st.session_state.setdefault("active_page", "Overview")
+st.markdown('<div class="hero"><span class="eyebrow">CONTACT CENTER INTELLIGENCE</span><h1>CallIQ</h1><p>Every Call Counts. Every Insight Matters.</p></div>', unsafe_allow_html=True)
+st.sidebar.markdown("## CallIQ")
+st.sidebar.caption("Quality review and coaching")
+st.sidebar.button("Overview", key="nav_overview", icon=":material/home:", type="primary" if page == "Overview" else "tertiary", use_container_width=True, on_click=go_to, args=("Overview",))
+st.sidebar.button("Analyze Call", key="nav_analyze", icon=":material/graphic_eq:", type="primary" if page == "Analyze Call" else "tertiary", use_container_width=True, on_click=go_to, args=("Analyze Call",))
+with st.sidebar.expander("Dashboards", expanded=page in {"Agent Dashboard", "Manager Dashboard", "QA Analyst"}, icon=":material/dashboard:"):
+    for label, destination, icon in (
+        ("Agent", "Agent Dashboard", ":material/person:"),
+        ("Manager", "Manager Dashboard", ":material/groups:"),
+        ("QA Analyst", "QA Analyst", ":material/fact_check:"),
+    ):
+        st.button(label, key=f"nav_{label.lower().replace(' ', '_')}", icon=icon,
+                  type="primary" if page == destination else "tertiary", use_container_width=True,
+                  on_click=go_to, args=(destination,))
+st.sidebar.button("Performance Reports", key="nav_reports", icon=":material/monitoring:", type="primary" if page == "Performance Reports" else "tertiary", use_container_width=True, on_click=go_to, args=("Performance Reports",))
+st.sidebar.button("About", key="nav_about", icon=":material/info:", type="primary" if page == "About" else "tertiary", use_container_width=True, on_click=go_to, args=("About",))
 st.sidebar.divider()
-st.sidebar.caption(f"{len(all_calls)} visible evaluations in this session")
-st.sidebar.caption("Demo data is synthetic. Fresh analyses stay in your browser session.")
+st.sidebar.caption("Demo workspace · saved cases are synthetic")
+st.sidebar.caption("New analyses remain in this browser session.")
 
 
 def result_view(call):
     st.markdown(f"### {call.primary_intent}")
-    st.caption(f"{call.origin} · Agent: {call.agent_id} · {call.call_id}")
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Quality score", f"{call.score}%" if call.score is not None else "Unscored")
-    m2.metric("Evidence coverage", f"{call.score_coverage}%")
-    m3.metric("Review priority", call.review_priority)
-    m4.metric("Rubric checks", len(call.findings))
-    st.caption("A preliminary score uses only assessable checks. Coverage shows how much of the rubric could be judged.")
+    st.caption(f"{call.origin} · {call.agent_id} · {call.call_id}")
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Preliminary QA score", f"{call.score}%" if call.score is not None else "Unscored")
+    m2.metric("Rubric coverage", f"{call.score_coverage}%")
+    m3.metric("QA review priority", call.review_priority)
+    st.caption("The score uses only assessable checks. Coverage is the share of the rubric supported by this recording.")
     if call.transcript.recording_scope == "opening_excerpt":
         st.info("This clip covers only the start of a call. Later steps are unassessed; a score is withheld below 50% coverage.")
-    if call.review_reason != "Routine sampling": st.warning(f"Why QA should review this call: {call.review_reason}")
-    st.markdown("#### QA findings")
-    st.caption("Open a check to see the exact transcript evidence and the suggested correction.")
+    if call.review_reason != "Routine sampling":
+        st.warning(f"Why QA should review this call: {call.review_reason}")
     by_id = {segment.segment_id: segment for segment in call.transcript.segments}
-    for item in sorted(call.findings, key=lambda f: {"FAIL": 0, "INSUFFICIENT_EVIDENCE": 1, "PASS": 2, "NOT_APPLICABLE": 3}[f.status.value]):
+    ordered = sorted(call.findings, key=lambda f: {"FAIL": 0, "INSUFFICIENT_EVIDENCE": 1, "PASS": 2, "NOT_APPLICABLE": 3}[f.status.value])
+    if ordered:
+        item = ordered[0]
         criterion = CRITERIA[item.criterion_id]
         label = {"PASS": "Passed", "FAIL": "Needs attention", "INSUFFICIENT_EVIDENCE": "Not enough evidence", "NOT_APPLICABLE": "Not applicable"}[item.status.value]
-        with st.expander(f"{label}  ·  {criterion['label']}  ·  {criterion['weight']}% weight", expanded=item.status.value == "FAIL"):
+        st.markdown("#### The first finding to review")
+        with st.container(border=True):
+            st.markdown(f"**{label} · {criterion['label']}**")
+            st.write(item.explanation)
+            for segment_id in item.evidence_segment_ids:
+                segment = by_id[segment_id]
+                st.caption(f"Evidence · {segment.start_seconds:.1f}s · {segment.role.title()} · {segment_id}: “{segment.text}”")
+            if item.suggested_correction:
+                st.write("Suggested correction:", item.suggested_correction)
+    st.markdown("#### What to try on the next call")
+    for tip in call.coaching:
+        with st.container(border=True):
+            st.markdown(f"**{tip.title}**")
+            st.write(f"Try saying: “{tip.example_response}”")
+            st.caption(f"Practice: {tip.next_step} · Evidence: {', '.join(tip.evidence_segment_ids)}")
+    if not call.coaching:
+        st.caption("No coaching recommendation was generated for this call.")
+    with st.expander(f"Remaining rubric checks ({max(0, len(ordered) - 1)})"):
+        for item in ordered[1:]:
+            criterion = CRITERIA[item.criterion_id]
+            label = {"PASS": "Passed", "FAIL": "Needs attention", "INSUFFICIENT_EVIDENCE": "Not enough evidence", "NOT_APPLICABLE": "Not applicable"}[item.status.value]
+            st.markdown(f"**{label} · {criterion['label']} · {criterion['weight']}% weight**")
             st.write(item.explanation)
             for segment_id in item.evidence_segment_ids:
                 segment = by_id[segment_id]
                 st.caption(f"{segment.start_seconds:.1f}s · {segment.role.title()} · {segment_id}: “{segment.text}”")
-            if item.suggested_correction: st.write("Suggested correction:", item.suggested_correction)
-    st.markdown("#### Coaching to try next")
-    for tip in call.coaching:
-        st.markdown(f"**{tip.title}** — {tip.why_it_matters}")
-        st.write("Example response:", tip.example_response)
-        st.caption(f"Next step: {tip.next_step} · Evidence: {', '.join(tip.evidence_segment_ids)}")
-    with st.expander("Full transcript and technical details"):
-        st.caption(f"Transcription: {call.transcript.transcription_provider} / {call.transcript.transcription_model} · Evaluation: {call.llm_provider} / {call.llm_model}")
+            st.divider()
+    with st.expander("Full transcript"):
         for segment in call.transcript.segments:
             st.markdown(f"**{segment.start_seconds:05.1f}s · {segment.role.title()} · {segment.segment_id}**  {segment.text}")
+    with st.expander("Technical details"):
+        st.caption(f"Transcription: {call.transcript.transcription_provider} / {call.transcript.transcription_model} · Evaluation: {call.llm_provider} / {call.llm_model}")
+        st.caption(f"Rubric version: {call.rubric_version} · Prompt version: {call.prompt_version}")
     st.download_button("Download evaluation JSON", call.model_dump_json(indent=2), f"{call.call_id}.json", "application/json")
 
 
 if page == "Overview":
-    st.header("Turn a call into clear next steps")
-    st.markdown('<div class="guide">Start with a saved case for a reliable walkthrough. Then try the 25-second public recording if you want to show live AI processing.</div>', unsafe_allow_html=True)
-    left, right = st.columns(2, gap="large")
+    st.header("Review a call. See the evidence. Coach the next one.")
+    st.markdown('<div class="guide">Start with a prepared case to understand the full quality loop. New audio analysis is available when you need it.</div>', unsafe_allow_html=True)
+    left, right = st.columns([1.25, 1], gap="large")
     with left:
-        st.subheader("Ready-made demo · no API calls")
-        st.write("Open **Analyze Call → Saved demonstration**. Choose the card replacement case to see a flagged finding, its transcript evidence, and coaching.")
+        st.subheader("Explore a saved case")
+        st.write("Follow a synthetic card replacement call from transcript evidence to QA priority and a coaching response. Ready immediately; no provider request.")
+        st.button("Explore a saved case", key="overview_saved_case", icon=":material/play_arrow:", type="primary", on_click=go_to, args=("Analyze Call", "Saved case"))
     with right:
-        st.subheader("Live AI · uses provider credits")
-        st.write("Open **Analyze Call → Upload and process**. Select the bundled public clip, transcribe it, confirm the agent, and request an evaluation.")
-    st.markdown("#### Then explore each role")
-    st.write("**Agent Dashboard:** individual feedback  →  **Manager Dashboard:** team patterns  →  **QA Analyst:** review queue  →  **Performance Reports:** weekly coaching preview")
+        st.subheader("Analyze a new call")
+        st.write("Use an authorized recording or the bundled public sample. Confirm the agent before evaluation. Transcription and evaluation may use provider credits.")
+        st.button("Analyze a new call", key="overview_new_call", icon=":material/graphic_eq:", on_click=go_to, args=("Analyze Call", "New audio analysis"))
     st.divider()
-    st.subheader("What is visible right now")
+    st.markdown('<div class="role-strip"><h3>One conversation, three useful views</h3><div class="role-grid"><div><strong>Agent</strong><span>A response to practice on the next call.</span></div><div><strong>Manager</strong><span>Patterns to discuss with the team.</span></div><div><strong>QA analyst</strong><span>A queue ordered for human review.</span></div></div></div>', unsafe_allow_html=True)
+    st.subheader("Demo workspace status")
     stats = summarize(all_calls)
     a, b, c = st.columns(3)
     a.metric("Visible calls", stats["calls"])
     b.metric("Average assessable score", f"{stats['average_score']}%" if stats["average_score"] is not None else "—")
     c.metric("Flagged for QA", stats["flagged"])
-    st.caption("Includes synthetic examples and any analyses in this browser session. These are demonstration metrics, not production KPIs.")
+    st.caption("Includes synthetic examples and analyses in this browser session. These are demonstration counts, not production KPIs.")
     st.info("Preliminary AI findings require human QA. Use only public or synthetic recordings in this demo; it has no account access control.")
 
 elif page == "Analyze Call":
     st.header("Analyze a call")
-    st.caption("Choose a ready-made result for a guaranteed demo, or run a new analysis with your configured providers.")
-    demo_tab, corpus_tab, upload_tab, manual_tab = st.tabs(["Saved demonstration", "Public corpus", "Upload and process", "Manual transcript"])
+    st.caption("Start with a prepared case, or choose a new analysis path. Provider requests begin only when you press a processing button.")
+    tab_labels = ["Saved case", "New audio analysis", "Public corpus", "Manual transcript"]
+    target = st.session_state.pop("analysis_tab_target", None)
+    tab_version = st.session_state.get("analysis_tab_version", 0)
+    demo_tab, upload_tab, corpus_tab, manual_tab = st.tabs(tab_labels, default=target or "Saved case", key=f"analysis_tabs_{tab_version}")
     with demo_tab:
         st.markdown('<p class="step">Start here · instant and free</p>', unsafe_allow_html=True)
         st.write("These six cases have manually authored demo findings. No provider request is made when you inspect them.")
@@ -258,7 +304,7 @@ elif page == "Analyze Call":
 
 elif page == "Agent Dashboard":
     st.header("Agent view")
-    st.caption("See patterns across calls, then open a specific result for evidence and coaching.")
+    st.caption("See your recurring coaching opportunities, then open a call to practice a better response.")
     agents = sorted({c.agent_id for c in all_calls})
     agent = st.selectbox("Choose an agent", agents, index=agents.index("Agent Maya") if "Agent Maya" in agents else 0)
     calls = [c for c in all_calls if c.agent_id == agent]
@@ -269,12 +315,13 @@ elif page == "Agent Dashboard":
     c3.metric("Flagged", stats["flagged"])
     st.line_chart({c.call_id: c.score for c in reversed(calls) if c.score is not None})
     st.write("**Recurring opportunities:**", ", ".join(f"{CRITERIA[k]['label']} ({v})" for k, v in stats["misses"].most_common()) or "None in visible calls")
+    st.markdown("#### Next action: inspect a call and rehearse its coaching response")
     call = st.selectbox("Inspect a call", calls, format_func=lambda c: f"{c.call_id} · {c.primary_intent}")
     if call: result_view(call)
 
 elif page == "Manager Dashboard":
     st.header("Manager view")
-    st.caption("A quick view of team quality, review workload, and repeated coaching topics. Demo agents are aliases.")
+    st.caption("Spot repeated quality issues and choose a coaching topic for your team. Demo agents are aliases.")
     team = summarize(all_calls)
     t1, t2, t3 = st.columns(3)
     t1.metric("Visible calls", team["calls"])
@@ -289,12 +336,13 @@ elif page == "Manager Dashboard":
     st.subheader("Repeated coaching topics")
     misses = summarize(all_calls)["misses"]
     st.bar_chart({CRITERIA[k]["label"]: v for k, v in misses.items()})
+    st.caption("Next action: select a repeated topic and review example calls with a QA analyst before coaching the team.")
     with st.expander("See all calls"):
         st.dataframe([{"Call": c.call_id, "Agent": c.agent_id, "Intent": c.primary_intent, "Score": c.score, "Priority": c.review_priority, "Source": c.origin} for c in all_calls], hide_index=True, width="stretch")
 
 elif page == "QA Analyst":
     st.header("QA review queue")
-    st.caption("Prioritized by critical failures, uncertainty, and low assessable scores. A human reviewer owns the decision. On this public demo, reviews are session-only; enter no private information.")
+    st.caption("Open the highest-priority call, check its cited evidence, then approve, correct, or request follow-up. Reviews in this public demo stay in your session; enter no private information.")
     queue = sorted(all_calls, key=lambda c: ({"High": 0, "Medium": 1, "Low": 2}[c.review_priority], c.created_at))
     st.dataframe([{"Call": c.call_id, "Priority": c.review_priority, "Reason": c.review_reason, "Agent": c.agent_id, "Score": c.score} for c in queue], hide_index=True, width="stretch")
     call = st.selectbox("Review call", queue, format_func=lambda c: f"{c.review_priority} · {c.call_id}")

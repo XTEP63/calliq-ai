@@ -77,6 +77,17 @@ COACHING = {
     "demo-payment-04": ("Confirm payment details", "I have scheduled [verified amount] for [verified date]. Does that match your request?", "Confirm amount and date before ending payment calls."),
     "demo-escalation-06": ("Explain the escalation follow-up", "I will confirm how and when the disputes team will contact you before we finish.", "Give a verified next step and timeframe."),
 }
+CARD_EXPLANATIONS = {
+    "greeting": "Maya identifies the bank and herself, then invites the customer's request.",
+    "identity": "The call moves from the lost-card request to a replacement promise without an identity check.",
+    "understanding": "Maya acknowledges the replacement request and gives an arrival estimate.",
+    "resolution": "The call does not confirm whether the old card was blocked; a reviewer should verify the procedure.",
+    "closing": "Maya ends the call without checking for another question or confirming the next step.",
+}
+CARD_CORRECTIONS = {
+    "identity": "Complete identity verification before processing the replacement.",
+    "closing": "Ask whether the customer needs anything else and confirm the next step.",
+}
 
 
 def demo_analyses():
@@ -95,10 +106,14 @@ def demo_analyses():
         findings = []
         for idx, (criterion, status) in enumerate(zip(CRITERION_IDS, statuses)):
             evidence = [segments[j-1].segment_id for j in EVIDENCE[call_id][idx]]
-            explanation = f"Synthetic demo review: {criterion.replace('_', ' ')} is {status.lower().replace('_', ' ')}. {reason}"
+            explanation = (CARD_EXPLANATIONS.get(criterion) if call_id == "demo-card-02" else None)
+            if not explanation:
+                explanation = f"Synthetic demo review: {criterion.replace('_', ' ')} is {status.lower().replace('_', ' ')}. {reason}"
+            correction = ""
+            if status == "FAIL":
+                correction = CARD_CORRECTIONS.get(criterion, "Confirm this step explicitly with the customer.") if call_id == "demo-card-02" else "Confirm this step explicitly with the customer."
             findings.append(CriterionFinding(criterion_id=criterion, status=Status(status), explanation=explanation,
-                                             evidence_segment_ids=evidence,
-                                             suggested_correction="Confirm this step explicitly with the customer." if status == "FAIL" else ""))
+                                             evidence_segment_ids=evidence, suggested_correction=correction))
         fail = next((f for f in findings if f.status == Status.FAIL), None)
         title, example, step = COACHING.get(call_id, ("Maintain clear confirmation", "Have I fully answered your question today?", "Keep confirming the outcome before closing."))
         coaching_evidence = fail.evidence_segment_ids if fail and fail.evidence_segment_ids else [segments[-1].segment_id]

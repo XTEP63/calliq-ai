@@ -2,22 +2,21 @@
 
 ## Ruta recomendada: Streamlit público
 
-Abre [calliq-ai.streamlit.app](https://calliq-ai.streamlit.app/) antes de entrar a la sala y conserva una pestaña con la app ya cargada. Usa pantalla compartida a 100% de zoom y prueba el audio. La app pública es la ruta recomendada: no requiere instalar nada en la máquina del evento y tiene los Secrets configurados en Streamlit Cloud.
+Si el formato permite mostrar la app, abre [calliq-ai.streamlit.app](https://calliq-ai.streamlit.app/) antes de entrar a la sala y conserva una pestaña con la app ya cargada. Usa pantalla compartida a 100% de zoom y prueba el audio. La presentación PPTX funciona por sí sola; esta ruta es una extensión opcional.
 
-1. En **Overview**, explica el problema y anuncia que verán una llamada que exige atención de QA.
-2. Ve a **Analyze Call → Saved demonstration**. El caso predeterminado es **Card replacement · Agent Maya · High priority**. Es sintético y sus hallazgos fueron escritos para la demo; no consume APIs.
-3. Reproduce unos segundos del audio. Muestra la prioridad, abre **Needs attention · Identity verification**, lee el segmento citado y enseña la sugerencia de coaching. Explica que el puntaje sale de un rubric calculado en Python, no de una cifra inventada por el modelo.
-4. Ve a **Agent Dashboard**, elige **Agent Maya** y enseña sus llamadas e historial. Luego ve a **Manager Dashboard** para mostrar resumen por agente y temas repetidos.
-5. Ve a **QA Analyst** y selecciona la llamada marcada. Demuestra que una persona puede aprobar o corregir el hallazgo; las notas de la demo pública solo viven en esa sesión. Evita escribir datos privados.
+1. En **Overview**, pulsa **Explore a saved case**. El caso predeterminado es **Card replacement · Agent Maya · High priority**. Es sintético y sus hallazgos fueron escritos para la demo; no consume APIs.
+2. Reproduce unos segundos del audio. Muestra la prioridad, lee **The first finding to review** con sus segmentos citados y enseña la respuesta de coaching. Explica que el puntaje sale de un rubric calculado en Python, no de una cifra inventada por el modelo.
+4. Abre **Dashboards → Agent**, elige **Agent Maya** y enseña sus llamadas e historial. Luego ve a **Dashboards → Manager** para mostrar resumen por agente y temas repetidos.
+5. Ve a **Dashboards → QA Analyst** y selecciona la llamada marcada. Demuestra que una persona puede aprobar o corregir el hallazgo; las notas de la demo pública solo viven en esa sesión. Evita escribir datos privados.
 6. Ve a **Performance Reports**, selecciona **Agent Maya** y muestra la vista previa. El HTML se puede descargar; CallIQ no manda correos.
 
 Esta ruta es suficiente si el Wi-Fi del evento es lento, un proveedor falla o no quieres gastar créditos. Mantén abierta también la presentación PPTX en PowerPoint local.
 
 ## Extensión opcional: análisis nuevo con APIs
 
-Usa **Analyze Call → Upload and process** y marca **Use bundled 25-second two-speaker sample**. No uses las grabaciones sintéticas TTS para demostrar diarización: ambas voces se generaron con un solo motor de voz. Pulsa **Transcribe recording**, revisa los segmentos y confirma que el agente es **Speaker 0** solo si el transcript de esa ejecución lo respalda. Después pulsa **Evaluate confirmed transcript**. Son dos solicitudes externas, una a Deepgram y otra a Groq, que pueden consumir créditos o generar cargos. Comprueba el saldo y la autorización antes de ejecutarlas de nuevo.
+Usa **Analyze Call → New audio analysis** y marca **Use bundled 25-second two-speaker sample**. No uses las grabaciones sintéticas TTS para demostrar diarización: ambas voces se generaron con un solo motor de voz. Pulsa **Transcribe recording**, revisa los segmentos y confirma que el agente es **Speaker 0** solo si el transcript de esa ejecución lo respalda. Después pulsa **Evaluate confirmed transcript**. Son dos solicitudes externas, una a Deepgram y otra a Groq, que pueden consumir créditos o generar cargos. Comprueba el saldo y la autorización antes de ejecutarlas de nuevo.
 
-El clip público termina a los 25 segundos. Por eso verificación, resolución y cierre pueden quedar como **Not enough evidence** y el puntaje puede figurar **Unscored**. Eso demuestra un control importante: CallIQ no convierte ausencia de audio en un fallo confirmado. Si la API tarda, vuelve a **Saved demonstration** sin esperar en silencio.
+El clip público termina a los 25 segundos. Por eso verificación, resolución y cierre pueden quedar como **Not enough evidence** y el puntaje puede figurar **Unscored**. Eso demuestra un control importante: CallIQ no convierte ausencia de audio en un fallo confirmado. Si la API tarda, vuelve a **Saved case** sin esperar en silencio.
 
 ## Alternativa local
 
