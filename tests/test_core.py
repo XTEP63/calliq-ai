@@ -12,6 +12,7 @@ from src.ingestion.audio import inspect_audio
 from src.storage.sqlite import Store
 from src.transcription.providers import assign_roles, normalize_deepgram
 from src.services.pipeline import confirm_roles
+from src.services import pipeline
 
 
 def wav_bytes(channels=1):
@@ -75,3 +76,18 @@ def test_storage_and_report(tmp_path):
     report = report_html(cases, "Agent Maya", date(2026, 11, 14), date(2026, 11, 19))
     assert "4 calls analyzed" in report and "Next goals" in report
     assert "0 calls analyzed" in report_html(cases, "Agent Maya", date(2026, 11, 1), date(2026, 11, 2))
+
+
+def test_public_mode_does_not_share_live_analysis(tmp_path, monkeypatch):
+    store = Store(str(tmp_path / "public.sqlite3"))
+    sample = demo_analyses()[0]
+    judgment = LLMJudgment(primary_intent=sample.primary_intent, classification_reason=sample.classification_reason,
+                           findings=sample.findings, coaching=sample.coaching)
+    monkeypatch.setattr(pipeline, "groq_evaluate", lambda transcript: judgment)
+    monkeypatch.setenv("LLM_PROVIDER", "groq")
+    monkeypatch.setenv("APP_MODE", "online")
+    analysis, _ = pipeline.evaluate_transcript(sample.transcript, "Visitor agent", store)
+    assert analysis.score == 100 and store.get(sample.call_id) is None
+    monkeypatch.setenv("APP_MODE", "local")
+    pipeline.evaluate_transcript(sample.transcript, "Visitor agent", store)
+    assert store.get(sample.call_id) is not None

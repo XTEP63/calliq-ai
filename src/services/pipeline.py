@@ -19,7 +19,8 @@ def transcribe_audio(data: bytes, filename: str, store: Store) -> tuple[Transcri
     provider = os.getenv("TRANSCRIPTION_PROVIDER", "deepgram")
     model = "nova-3" if provider == "deepgram" else os.getenv("WHISPER_MODEL", "small.en")
     key = _key(audio["sha256"], provider, model, "diarize-latest", "en")
-    cached = store.cache_get(key, "transcript")
+    persist = os.getenv("APP_MODE", "online") == "local"
+    cached = store.cache_get(key, "transcript") if persist else None
     if cached:
         return Transcript.model_validate(cached), "Cached transcription"
     call_id = audio["sha256"][:16]
@@ -29,7 +30,8 @@ def transcribe_audio(data: bytes, filename: str, store: Store) -> tuple[Transcri
         transcript = faster_whisper_transcribe(data, filename.rsplit(".", 1)[-1].lower(), call_id, audio["duration_seconds"])
     else:
         raise ValueError(f"Unsupported transcription provider: {provider}")
-    store.cache_put(key, "transcript", transcript)
+    if persist:
+        store.cache_put(key, "transcript", transcript)
     return transcript, "Fresh transcription"
 
 
@@ -37,7 +39,8 @@ def evaluate_transcript(transcript: Transcript, agent_id: str, store: Store, ori
     provider = os.getenv("LLM_PROVIDER", "groq")
     model = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b") if provider == "groq" else os.getenv("OLLAMA_MODEL", "qwen3:4b")
     key = _key(transcript.model_dump(mode="json"), provider, model, "evaluation-v1", "banking-v1", agent_id, origin)
-    cached = store.cache_get(key, "analysis")
+    persist = os.getenv("APP_MODE", "online") == "local"
+    cached = store.cache_get(key, "analysis") if persist else None
     if cached:
         return Analysis.model_validate(cached), "Cached evaluation"
     if provider == "groq":
@@ -48,8 +51,9 @@ def evaluate_transcript(transcript: Transcript, agent_id: str, store: Store, ori
         raise ValueError(f"Unsupported LLM provider: {provider}")
     analysis = build_analysis(transcript, judgment, agent_id=agent_id, origin=origin,
                               llm_provider=provider, llm_model=model)
-    store.cache_put(key, "analysis", analysis)
-    store.save(analysis)
+    if persist:
+        store.cache_put(key, "analysis", analysis)
+        store.save(analysis)
     return analysis, "Fresh live analysis"
 
 

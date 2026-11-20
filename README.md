@@ -59,7 +59,7 @@ flowchart LR
 
 Rubric `banking-v1` assigns 10% greeting, 25% identity verification when applicable, 20% understanding, 30% resolution, and 15% closing. `NOT_APPLICABLE` is removed from the denominator. `INSUFFICIENT_EVIDENCE` is excluded from the score calculation and reduces displayed score coverage. Critical failures are flagged independently. A finding with an unknown segment ID is rejected. All AI outputs are preliminary and need human QA before consequential use.
 
-SQLite stores evaluations, transcription/evaluation caches, and QA review history. Cache keys include audio hash or full transcript, provider/model, prompt and rubric versions, and agent alias. Local SQLite is **ephemeral** on Streamlit Community Cloud; bundled samples reload on startup, while live uploads and human reviews are not durable there. A production deployment needs external storage and user authentication.
+In `APP_MODE=local`, SQLite stores evaluations, separate transcription/evaluation caches, and QA review history. Cache keys include audio hash or full transcript, provider/model, prompt and rubric versions, and agent alias. In the default online mode, uploaded calls, generated evaluations, and human review notes stay in the current Streamlit browser session, so visitors do not see each other's content through a shared SQLite file. Bundled sample data reloads on startup. A production deployment needs external storage and user authentication.
 
 ## Dataset and attribution
 

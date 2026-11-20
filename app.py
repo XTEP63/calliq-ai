@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import hashlib
 import os
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import streamlit as st
@@ -105,7 +105,7 @@ elif page == "Analyze Call":
                 transcript = Transcript.model_validate_json((Path("data/harpervalley") / entry["transcript"]).read_text(encoding="utf-8"))
                 for segment in transcript.segments:
                     st.markdown(f"**{segment.start_seconds:05.1f}s · {segment.role.title()}**  {segment.text}")
-                saved = store.get(entry["call_id"])
+                saved = st.session_state.get("corpus_analyses", {}).get(entry["call_id"]) or store.get(entry["call_id"])
                 if saved:
                     st.markdown("#### Saved evaluation")
                     result_view(saved)
@@ -116,6 +116,7 @@ elif page == "Analyze Call":
                             agent_id = f"Corpus agent {entry['agent_speaker_id']}"
                             with st.spinner("Evaluating the public corpus transcript…"):
                                 analysis, source = evaluate_transcript(transcript, agent_id, store, "Fresh evaluation of public corpus transcript")
+                            st.session_state.setdefault("corpus_analyses", {})[entry["call_id"]] = analysis
                             st.success(source)
                             result_view(analysis)
                         except Exception as exc:
@@ -193,7 +194,7 @@ elif page == "Manager Dashboard":
 
 elif page == "QA Analyst":
     st.header("QA review queue")
-    st.caption("Prioritized by critical failures, uncertainty, and low assessable scores. A human reviewer owns the decision.")
+    st.caption("Prioritized by critical failures, uncertainty, and low assessable scores. A human reviewer owns the decision. On this public demo, reviews are session-only; enter no private information.")
     queue = sorted(all_calls, key=lambda c: ({"High": 0, "Medium": 1, "Low": 2}[c.review_priority], c.created_at))
     st.dataframe([{"Call": c.call_id, "Priority": c.review_priority, "Reason": c.review_reason, "Agent": c.agent_id, "Score": c.score} for c in queue], hide_index=True, width="stretch")
     call = st.selectbox("Review call", queue, format_func=lambda c: f"{c.review_priority} · {c.call_id}")
@@ -205,10 +206,16 @@ elif page == "QA Analyst":
             notes = st.text_area("Correction or review notes")
             if st.form_submit_button("Save review"):
                 if reviewer.strip() and notes.strip():
-                    store.add_review(call.call_id, reviewer.strip(), decision, notes.strip())
-                    st.success("Review saved to this app instance.")
+                    if os.getenv("APP_MODE", "online") == "local":
+                        store.add_review(call.call_id, reviewer.strip(), decision, notes.strip())
+                        st.success("Review saved locally.")
+                    else:
+                        st.session_state.setdefault("qa_reviews", {}).setdefault(call.call_id, []).append(
+                            (reviewer.strip(), decision, notes.strip(), datetime.now(timezone.utc).isoformat()))
+                        st.success("Review saved in this browser session.")
                 else: st.error("Enter a reviewer alias and notes.")
-        for reviewer, decision, notes, when in store.reviews(call.call_id):
+        reviews = store.reviews(call.call_id) if os.getenv("APP_MODE", "online") == "local" else st.session_state.get("qa_reviews", {}).get(call.call_id, [])
+        for reviewer, decision, notes, when in reviews:
             st.caption(f"{when} · {reviewer} · {decision}: {notes}")
 
 elif page == "Performance Reports":
