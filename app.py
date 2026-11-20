@@ -27,71 +27,101 @@ for secret_name in ("DEEPGRAM_API_KEY", "GROQ_API_KEY", "TRANSCRIPTION_PROVIDER"
         pass
 
 st.markdown("""<style>
-.block-container{padding-top:2rem;max-width:1350px}.hero{padding:30px 34px;border-radius:18px;background:linear-gradient(115deg,#143148,#0b5364);margin-bottom:24px}.hero h1{margin:0;color:#fff;font-size:2.5rem}.hero p{color:#ccebf0;font-size:1.1rem;margin:6px 0 0}.badge{display:inline-block;padding:4px 10px;border-radius:30px;background:#134c61;color:#c6f6ff;font-size:.8rem;margin-bottom:10px}.small{color:#9cb4c6;font-size:.9rem}
+.block-container{padding-top:1.5rem;max-width:1240px;padding-bottom:4rem}
+.hero{padding:38px 42px;border-radius:22px;background:radial-gradient(circle at 85% 20%,#147486 0%,#0d354a 38%,#0b2031 78%);margin-bottom:26px;border:1px solid #246075}
+.hero h1{margin:0;color:#fff;font-size:3rem;letter-spacing:-.035em}.hero p{color:#ccebf0;font-size:1.15rem;margin:8px 0 0}
+.eyebrow{color:#7ce8ec;font-size:.75rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+.guide{border-left:3px solid #22c7cb;padding:10px 0 10px 18px;margin:14px 0 26px;color:#d8edf2}
+.quiet{color:#a8bdca;font-size:.9rem}.step{color:#7ce8ec;font-weight:800;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}
+div[data-testid="stMetric"]{border:1px solid #284358;border-radius:14px;padding:15px 18px;background:#11253a}
+div[data-testid="stMetricLabel"]{font-weight:650}div[data-testid="stMetricValue"]{color:#e9fbfd}
+div[data-testid="stExpander"]{border-color:#2b475b;border-radius:12px}
+div[data-testid="stSidebar"]{border-right:1px solid #223d50}
 </style>""", unsafe_allow_html=True)
 
 store = Store(os.getenv("CALLIQ_DB_PATH", "data/calliq.sqlite3"))
 seed_demo(store)
 all_calls = visible_analyses(store.list(), st.session_state.get("session_analyses", {}))
 
-st.markdown('<div class="hero"><span class="badge">CONTACT CENTER INTELLIGENCE</span><h1>CallIQ</h1><p>Every Call Counts. Every Insight Matters.</p></div>', unsafe_allow_html=True)
-st.caption("Preliminary AI assessments support human QA. Demo views do not enforce access control. Synthetic examples are labeled throughout.")
+st.markdown('<div class="hero"><span class="eyebrow">CONTACT CENTER INTELLIGENCE</span><h1>CallIQ</h1><p>Every Call Counts. Every Insight Matters.</p></div>', unsafe_allow_html=True)
+st.sidebar.markdown("### CallIQ workspace")
+st.sidebar.caption("Explore a ready-made case or analyze a public sample live.")
 
 page = st.sidebar.radio("Workspace", ["Overview", "Analyze Call", "Agent Dashboard", "Manager Dashboard", "QA Analyst", "Performance Reports", "Architecture & About"])
 st.sidebar.divider()
-st.sidebar.caption(f"{len(all_calls)} visible evaluations · {sum(c.origin.startswith('Synthetic') for c in all_calls)} synthetic demos")
+st.sidebar.caption(f"{len(all_calls)} visible evaluations in this session")
+st.sidebar.caption("Demo data is synthetic. Fresh analyses stay in your browser session.")
 
 
 def result_view(call):
-    st.info(f"Source: {call.origin} · Transcript: {call.transcript.transcription_provider} / {call.transcript.transcription_model} · Evaluation: {call.llm_provider} / {call.llm_model}")
+    st.markdown(f"### {call.primary_intent}")
+    st.caption(f"{call.origin} · Agent: {call.agent_id} · {call.call_id}")
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("Quality score", f"{call.score}%" if call.score is not None else "Unscored")
-    m2.metric("Score coverage", f"{call.score_coverage}%")
+    m2.metric("Evidence coverage", f"{call.score_coverage}%")
     m3.metric("Review priority", call.review_priority)
-    m4.metric("Primary intent", call.primary_intent)
-    st.caption("Scores use only assessable criteria. Unknown outcomes reduce coverage, not the score denominator.")
+    m4.metric("Rubric checks", len(call.findings))
+    st.caption("A preliminary score uses only assessable checks. Coverage shows how much of the rubric could be judged.")
     if call.transcript.recording_scope == "opening_excerpt":
-        st.info("Opening excerpt only. Later steps are unassessed, and a score is withheld when coverage is below 50%.")
-    if call.review_reason != "Routine sampling": st.warning(call.review_reason)
-    st.markdown("#### Transcript")
+        st.info("This clip covers only the start of a call. Later steps are unassessed; a score is withheld below 50% coverage.")
+    if call.review_reason != "Routine sampling": st.warning(f"Why QA should review this call: {call.review_reason}")
+    st.markdown("#### QA findings")
+    st.caption("Open a check to see the exact transcript evidence and the suggested correction.")
     by_id = {segment.segment_id: segment for segment in call.transcript.segments}
-    for segment in call.transcript.segments:
-        st.markdown(f"**{segment.start_seconds:05.1f}s · {segment.role.title()} · {segment.segment_id}**  {segment.text}")
-    st.markdown("#### Quality rubric")
-    for item in call.findings:
+    for item in sorted(call.findings, key=lambda f: {"FAIL": 0, "INSUFFICIENT_EVIDENCE": 1, "PASS": 2, "NOT_APPLICABLE": 3}[f.status.value]):
         criterion = CRITERIA[item.criterion_id]
-        with st.expander(f"{criterion['label']} · {item.status.value} · {criterion['weight']}%", expanded=item.status.value == "FAIL"):
+        label = {"PASS": "Passed", "FAIL": "Needs attention", "INSUFFICIENT_EVIDENCE": "Not enough evidence", "NOT_APPLICABLE": "Not applicable"}[item.status.value]
+        with st.expander(f"{label}  ·  {criterion['label']}  ·  {criterion['weight']}% weight", expanded=item.status.value == "FAIL"):
             st.write(item.explanation)
             for segment_id in item.evidence_segment_ids:
                 segment = by_id[segment_id]
-                st.caption(f"Evidence {segment_id} at {segment.start_seconds:.1f}s: “{segment.text}”")
+                st.caption(f"{segment.start_seconds:.1f}s · {segment.role.title()} · {segment_id}: “{segment.text}”")
             if item.suggested_correction: st.write("Suggested correction:", item.suggested_correction)
-    st.markdown("#### Coaching")
+    st.markdown("#### Coaching to try next")
     for tip in call.coaching:
         st.markdown(f"**{tip.title}** — {tip.why_it_matters}")
         st.write("Example response:", tip.example_response)
         st.caption(f"Next step: {tip.next_step} · Evidence: {', '.join(tip.evidence_segment_ids)}")
+    with st.expander("Full transcript and technical details"):
+        st.caption(f"Transcription: {call.transcript.transcription_provider} / {call.transcript.transcription_model} · Evaluation: {call.llm_provider} / {call.llm_model}")
+        for segment in call.transcript.segments:
+            st.markdown(f"**{segment.start_seconds:05.1f}s · {segment.role.title()} · {segment.segment_id}**  {segment.text}")
     st.download_button("Download evaluation JSON", call.model_dump_json(indent=2), f"{call.call_id}.json", "application/json")
 
 
 if page == "Overview":
-    st.header("From call recordings to actionable coaching")
-    st.write("CallIQ transcribes a conversation, applies a configurable QA rubric, verifies cited evidence, and turns findings into coaching and review priorities.")
+    st.header("Turn a call into clear next steps")
+    st.markdown('<div class="guide">Start with a saved case for a reliable walkthrough. Then try the 25-second public recording if you want to show live AI processing.</div>', unsafe_allow_html=True)
+    left, right = st.columns(2, gap="large")
+    with left:
+        st.subheader("Ready-made demo · no API calls")
+        st.write("Open **Analyze Call → Saved demonstration**. Choose the card replacement case to see a flagged finding, its transcript evidence, and coaching.")
+    with right:
+        st.subheader("Live AI · uses provider credits")
+        st.write("Open **Analyze Call → Upload and process**. Select the bundled public clip, transcribe it, confirm the agent, and request an evaluation.")
+    st.markdown("#### Then explore each role")
+    st.write("**Agent Dashboard:** individual feedback  →  **Manager Dashboard:** team patterns  →  **QA Analyst:** review queue  →  **Performance Reports:** weekly coaching preview")
+    st.divider()
+    st.subheader("What is visible right now")
     stats = summarize(all_calls)
     a, b, c = st.columns(3)
     a.metric("Visible calls", stats["calls"])
     b.metric("Average assessable score", f"{stats['average_score']}%" if stats["average_score"] is not None else "—")
     c.metric("Flagged for QA", stats["flagged"])
-    st.caption("These metrics include synthetic demonstration cases and any evaluations in this browser session. They are not production KPIs.")
-    st.subheader("Demonstration path")
-    st.write("Open **Analyze Call** to inspect a saved case or upload mono WAV/MP3. Continue through agent coaching, team metrics, QA review, and a report preview.")
+    st.caption("Includes synthetic examples and any analyses in this browser session. These are demonstration metrics, not production KPIs.")
+    st.info("Preliminary AI findings require human QA. Use only public or synthetic recordings in this demo; it has no account access control.")
 
 elif page == "Analyze Call":
-    st.header("Analyze a conversation")
+    st.header("Analyze a call")
+    st.caption("Choose a ready-made result for a guaranteed demo, or run a new analysis with your configured providers.")
     demo_tab, corpus_tab, upload_tab, manual_tab = st.tabs(["Saved demonstration", "Public corpus", "Upload and process", "Manual transcript"])
     with demo_tab:
+        st.markdown('<p class="step">Start here · instant and free</p>', unsafe_allow_html=True)
+        st.write("These six cases have manually authored demo findings. No provider request is made when you inspect them.")
         demos = [c for c in all_calls if c.origin.startswith("Synthetic")]
-        chosen = st.selectbox("Synthetic sample", demos, format_func=lambda c: f"{c.call_id} · {c.primary_intent} · {c.agent_id} · {c.review_priority}")
+        default_demo = next((i for i, call in enumerate(demos) if call.call_id == "demo-card-02"), 0)
+        chosen = st.selectbox("Choose a scenario", demos, index=default_demo,
+                              format_func=lambda c: f"{c.primary_intent} · {c.agent_id} · {c.review_priority} priority")
         if chosen:
             recording = Path("data/demo/audio") / f"{chosen.call_id}.mp3"
             if recording.exists():
@@ -99,6 +129,7 @@ elif page == "Analyze Call":
                 st.caption("Synthetic text-to-speech recording; saved transcript and manually authored provisional QA findings.")
             result_view(chosen)
     with corpus_tab:
+        st.write("Listen to a public simulated bank call and inspect its human-corrected transcript. AI evaluation is optional and uses LLM credits.")
         corpus_index = Path("data/harpervalley/index.json")
         if corpus_index.exists():
             entries = json.loads(corpus_index.read_text(encoding="utf-8"))
@@ -107,8 +138,9 @@ elif page == "Analyze Call":
             if entry:
                 st.audio(str(Path("data/harpervalley") / entry["audio"]))
                 transcript = Transcript.model_validate_json((Path("data/harpervalley") / entry["transcript"]).read_text(encoding="utf-8"))
-                for segment in transcript.segments:
-                    st.markdown(f"**{segment.start_seconds:05.1f}s · {segment.role.title()}**  {segment.text}")
+                with st.expander("Read the original transcript"):
+                    for segment in transcript.segments:
+                        st.markdown(f"**{segment.start_seconds:05.1f}s · {segment.role.title()}**  {segment.text}")
                 saved = st.session_state.get("corpus_analyses", {}).get(entry["call_id"]) or store.get(entry["call_id"])
                 if saved:
                     st.markdown("#### Saved evaluation")
@@ -129,6 +161,8 @@ elif page == "Analyze Call":
         else:
             st.info("Public corpus files have not been prepared. Run scripts/prepare_harpervalley.py with GitHub CLI and FFmpeg.")
     with upload_tab:
+        st.markdown('<p class="step">Step 1 of 3 · choose audio</p>', unsafe_allow_html=True)
+        st.write("Try the bundled public clip or upload an authorized mono WAV/MP3. A provider request starts only when you press **Transcribe recording**.")
         if not os.getenv("DEEPGRAM_API_KEY") and os.getenv("TRANSCRIPTION_PROVIDER", "deepgram") == "deepgram":
             st.warning("Live transcription needs DEEPGRAM_API_KEY. Saved demonstration cases remain available.")
         if not os.getenv("GROQ_API_KEY") and os.getenv("LLM_PROVIDER", "groq") == "groq":
@@ -137,7 +171,7 @@ elif page == "Analyze Call":
         if use_sample:
             audio_file_name = "harper-live-25s.mp3"
             audio_bytes = (Path("data/demo/audio") / audio_file_name).read_bytes()
-            st.caption("Opening excerpt of a public HarperValleyBank card replacement call. Later QA steps cannot be judged from this clip. Processing it makes fresh API requests.")
+            st.info("This 25-second clip contains two voices and only the start of a call. Later QA steps remain unassessed. Transcription and evaluation use provider credits.")
         else:
             uploaded = st.file_uploader("Mono WAV or MP3 · up to 20 MB and 15 minutes · authorized recordings only", type=["wav", "mp3"])
             audio_file_name = uploaded.name if uploaded else None
@@ -149,7 +183,7 @@ elif page == "Analyze Call":
                 st.session_state.pop("transcript", None)
                 st.session_state.pop("analysis", None)
             st.audio(audio_bytes, format="audio/mpeg" if audio_file_name.lower().endswith(".mp3") else "audio/wav")
-            if st.button("1. Transcribe recording", type="primary"):
+            if st.button("Transcribe recording", type="primary"):
                 try:
                     with st.spinner("Validating and transcribing…"):
                         transcript, source = transcribe_audio(audio_bytes, audio_file_name, store)
@@ -161,18 +195,20 @@ elif page == "Analyze Call":
                     st.error(f"Transcription failed: {exc}")
             transcript = st.session_state.get("transcript")
             if transcript:
+                st.markdown('<p class="step">Step 2 of 3 · confirm the agent</p>', unsafe_allow_html=True)
                 st.caption(f"Transcript: {transcript.transcription_provider} · {transcript.call_id}")
                 speakers = sorted({s.speaker_id for s in transcript.segments})
-                st.markdown("#### Review the transcript before assigning roles")
+                st.markdown("#### Check who said what")
                 for segment in transcript.segments:
                     st.markdown(f"**{segment.start_seconds:.1f}s · Speaker {segment.speaker_id} · {segment.segment_id}**  {segment.text}")
                 roles_uncertain = len(speakers) < 2 or "unknown" in speakers
                 if roles_uncertain:
                     st.warning("This transcript does not distinguish two speakers. Agent quality cannot be evaluated reliably. Use a recording with distinct voices or the Manual transcript tab with confirmed roles.")
-                agent_speaker = st.selectbox("2. Confirm which speaker is the agent", speakers, disabled=roles_uncertain)
+                agent_speaker = st.selectbox("Which speaker is the agent?", speakers, disabled=roles_uncertain)
                 agent_alias = st.text_input("Agent alias", value="Uploaded agent", disabled=roles_uncertain)
                 st.caption("Diarization distinguishes voices but does not identify the agent. Confirm the mapping from the transcript and audio before evaluating.")
-                if st.button("3. Evaluate confirmed transcript", disabled=roles_uncertain):
+                st.markdown('<p class="step">Step 3 of 3 · request QA analysis</p>', unsafe_allow_html=True)
+                if st.button("Evaluate confirmed transcript", disabled=roles_uncertain):
                     try:
                         ready = confirm_roles(transcript, agent_speaker)
                         with st.spinner("Evaluating rubric and checking evidence…"):
@@ -185,6 +221,7 @@ elif page == "Analyze Call":
                 if st.session_state.get("analysis"):
                     result_view(st.session_state["analysis"])
     with manual_tab:
+        st.write("Use this fallback when speech recognition is unavailable. Enter only an authorized transcript with real timestamps and confirmed roles.")
         st.caption("Fallback when transcription fails: enter an authorized English transcript with confirmed roles. One turn per line: start|end|agent-or-customer|text (times in seconds). No timestamps or roles are inferred.")
         manual_text = st.text_area("Role-labeled transcript", height=200,
                                    placeholder="0.0|2.5|agent|Thank you for calling. How may I help?\n2.6|4.0|customer|I need to check my balance.")
@@ -220,9 +257,10 @@ elif page == "Analyze Call":
                 result_view(st.session_state["manual_analysis"])
 
 elif page == "Agent Dashboard":
-    st.header("Agent dashboard")
+    st.header("Agent view")
+    st.caption("See patterns across calls, then open a specific result for evidence and coaching.")
     agents = sorted({c.agent_id for c in all_calls})
-    agent = st.selectbox("Agent alias", agents)
+    agent = st.selectbox("Choose an agent", agents, index=agents.index("Agent Maya") if "Agent Maya" in agents else 0)
     calls = [c for c in all_calls if c.agent_id == agent]
     stats = summarize(calls)
     c1, c2, c3 = st.columns(3)
@@ -230,23 +268,29 @@ elif page == "Agent Dashboard":
     c2.metric("Average assessable score", f"{stats['average_score']}%" if stats["average_score"] is not None else "—")
     c3.metric("Flagged", stats["flagged"])
     st.line_chart({c.call_id: c.score for c in reversed(calls) if c.score is not None})
-    st.write("Recurring opportunities:", ", ".join(f"{CRITERIA[k]['label']} ({v})" for k, v in stats["misses"].most_common()) or "None in saved cases")
+    st.write("**Recurring opportunities:**", ", ".join(f"{CRITERIA[k]['label']} ({v})" for k, v in stats["misses"].most_common()) or "None in visible calls")
     call = st.selectbox("Inspect a call", calls, format_func=lambda c: f"{c.call_id} · {c.primary_intent}")
     if call: result_view(call)
 
 elif page == "Manager Dashboard":
-    st.header("Manager dashboard")
-    st.caption("Synthetic sample agents and evaluations from this browser session. Agent aliases are demonstration labels.")
+    st.header("Manager view")
+    st.caption("A quick view of team quality, review workload, and repeated coaching topics. Demo agents are aliases.")
+    team = summarize(all_calls)
+    t1, t2, t3 = st.columns(3)
+    t1.metric("Visible calls", team["calls"])
+    t2.metric("Average assessable score", f"{team['average_score']}%" if team["average_score"] is not None else "—")
+    t3.metric("Need QA review", team["flagged"])
+    st.subheader("Agent summary")
+    rows = []
     for agent in sorted({c.agent_id for c in all_calls}):
-        calls = [c for c in all_calls if c.agent_id == agent]
-        stats = summarize(calls)
-        st.subheader(agent)
-        st.write(f"{stats['calls']} calls · average assessable score: {stats['average_score']}% · {stats['flagged']} flagged")
-        st.progress((stats["average_score"] or 0)/100)
-    st.subheader("Recurring missed criteria")
+        stats = summarize([c for c in all_calls if c.agent_id == agent])
+        rows.append({"Agent": agent, "Calls": stats["calls"], "Average score": stats["average_score"], "Flagged": stats["flagged"]})
+    st.dataframe(rows, hide_index=True, width="stretch")
+    st.subheader("Repeated coaching topics")
     misses = summarize(all_calls)["misses"]
     st.bar_chart({CRITERIA[k]["label"]: v for k, v in misses.items()})
-    st.dataframe([{"Call": c.call_id, "Agent": c.agent_id, "Intent": c.primary_intent, "Score": c.score, "Priority": c.review_priority, "Source": c.origin} for c in all_calls], hide_index=True, width="stretch")
+    with st.expander("See all calls"):
+        st.dataframe([{"Call": c.call_id, "Agent": c.agent_id, "Intent": c.primary_intent, "Score": c.score, "Priority": c.review_priority, "Source": c.origin} for c in all_calls], hide_index=True, width="stretch")
 
 elif page == "QA Analyst":
     st.header("QA review queue")
@@ -276,8 +320,9 @@ elif page == "QA Analyst":
 
 elif page == "Performance Reports":
     st.header("Weekly performance report")
+    st.caption("Preview coaching across multiple calls. Download the report as HTML; no email is sent.")
     agent = st.selectbox("Agent", sorted({c.agent_id for c in all_calls}))
-    period = st.date_input("Reporting period", value=(date(2026, 11, 13), date(2026, 11, 19)))
+    period = st.date_input("Reporting period", value=(date(2026, 11, 13), date.today()))
     if len(period) != 2:
         st.info("Select both start and end dates.")
     else:
@@ -291,7 +336,8 @@ elif page == "Performance Reports":
             st.caption("Preview only. CallIQ does not email reports.")
 
 else:
-    st.header("Architecture and safeguards")
+    st.header("How CallIQ works")
+    st.write("CallIQ is a post-call QA prototype. It turns audio into a transcript, asks a model for structured findings, checks cited segments, and calculates the rubric score in Python.")
     st.code("Audio → Deepgram / Faster-Whisper → canonical transcript → Groq / Ollama → evidence validation + Python scoring → SQLite → dashboards + report", language="text")
     st.write("Cloud deployment is stateless for uploaded recordings; the local SQLite file can disappear on Streamlit Community Cloud. Synthetic samples are bundled and reseeded. Durable multiuser storage requires a managed database.")
     st.write("Future AWS path: S3 upload, Step Functions orchestration, Transcribe, Bedrock, Aurora PostgreSQL, CloudWatch, and approved SES delivery.")

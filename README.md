@@ -34,6 +34,8 @@ For experimental local inference, install `requirements-local.txt`, install [Oll
 
 ## Demo walkthrough
 
+For a presentation-ready sequence with a no-cost fallback, see the [demo-day guide](docs/demo-day-es.md). The [English slide deck](presentation/output/CallIQ-innovation-demo.pptx) and [two-presenter speech](presentation/SPEAKER_SCRIPT.md) are in the repository. The PowerPoint file includes speaker notes and research citations; [sources](presentation/SOURCES.md) list the public product pages behind the market comparison.
+
 1. **Overview:** describe why sampled manual QA misses calls. Metrics are explicitly labeled as synthetic samples.
 2. **Analyze Call → Saved demonstration:** listen to `demo-balance-01` (strong), `demo-card-02` (critical issue), and `demo-escalation-06` (uncertain). Inspect exact transcript evidence, coverage, and coaching.
 3. **Analyze Call → Public corpus:** play a HarperValleyBank call and inspect its human-corrected transcript. With a Groq key, evaluate it live.
