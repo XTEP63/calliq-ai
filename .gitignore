@@ -1,0 +1,12 @@
+.env
+.streamlit/secrets.toml
+__pycache__/
+.pytest_cache/
+.venv/
+*.pyc
+*.db
+*.sqlite3
+data/uploads/
+data/cache/
+data/harpervalley/raw/
+*.log

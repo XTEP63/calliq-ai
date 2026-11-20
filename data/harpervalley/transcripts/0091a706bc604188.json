@@ -1,0 +1,185 @@
+{
+  "call_id": "0091a706bc604188",
+  "source": "HarperValleyBank human-corrected transcript (CC BY 4.0)",
+  "language": "en",
+  "duration_seconds": 51.13,
+  "audio_channels": 1,
+  "transcription_provider": "dataset human transcript",
+  "transcription_model": "none",
+  "speaker_mapping": {
+    "agent": "agent",
+    "caller": "customer"
+  },
+  "segments": [
+    {
+      "segment_id": "s1",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 1.42,
+      "end_seconds": 1.63,
+      "text": "[noise]",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s2",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 2.09,
+      "end_seconds": 2.1199999999999997,
+      "text": "[noise]",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s3",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 4.52,
+      "end_seconds": 9.23,
+      "text": "hello this is harper valley national bank my name is jennifer how can i help you today",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s4",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 10.69,
+      "end_seconds": 14.77,
+      "text": "hi my name is elizabeth david i need to check my account balance",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s5",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 12.52,
+      "end_seconds": 12.7,
+      "text": "[noise]",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s6",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 16.49,
+      "end_seconds": 16.61,
+      "text": "[noise]",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s7",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 19.72,
+      "end_seconds": 21.22,
+      "text": "alright which one would you like to check",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s8",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 22.79,
+      "end_seconds": 23.93,
+      "text": "my checking account",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s9",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 30.22,
+      "end_seconds": 32.949999999999996,
+      "text": "alright your balance is a hundred and thirty four dollars",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s10",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 36.82,
+      "end_seconds": 38.59,
+      "text": "is there anything else i can help you with today",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s11",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 37.32,
+      "end_seconds": 37.62,
+      "text": "thank you",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s12",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 39.82,
+      "end_seconds": 40.78,
+      "text": "that was going to be it",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s13",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 42.52,
+      "end_seconds": 44.86,
+      "text": "alright well thank you very much",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s14",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 42.99,
+      "end_seconds": 43.260000000000005,
+      "text": "[noise]",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s15",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 44.52,
+      "end_seconds": 44.64,
+      "text": "[noise]",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s16",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 46.42,
+      "end_seconds": 46.6,
+      "text": "alright",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s17",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 48.12,
+      "end_seconds": 48.21,
+      "text": "[noise]",
+      "confidence": null,
+      "channel": 1
+    }
+  ]
+}

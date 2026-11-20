@@ -1,0 +1,10 @@
+{
+  "version": "banking-v1",
+  "criteria": [
+    {"id": "greeting", "label": "Greeting and introduction", "weight": 10, "critical": false},
+    {"id": "identity", "label": "Identity verification when applicable", "weight": 25, "critical": true},
+    {"id": "understanding", "label": "Problem understanding", "weight": 20, "critical": false},
+    {"id": "resolution", "label": "Procedure and resolution", "weight": 30, "critical": true},
+    {"id": "closing", "label": "Closing and confirmation", "weight": 15, "critical": false}
+  ]
+}

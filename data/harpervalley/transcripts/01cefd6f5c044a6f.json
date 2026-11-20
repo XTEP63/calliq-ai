@@ -1,0 +1,185 @@
+{
+  "call_id": "01cefd6f5c044a6f",
+  "source": "HarperValleyBank human-corrected transcript (CC BY 4.0)",
+  "language": "en",
+  "duration_seconds": 63.0,
+  "audio_channels": 1,
+  "transcription_provider": "dataset human transcript",
+  "transcription_model": "none",
+  "speaker_mapping": {
+    "agent": "agent",
+    "caller": "customer"
+  },
+  "segments": [
+    {
+      "segment_id": "s1",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 2.29,
+      "end_seconds": 6.16,
+      "text": "hello this is harper valley national bank my name is michael how can i help you today",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s2",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 9.02,
+      "end_seconds": 9.379999999999999,
+      "text": "hi",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s3",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 10.32,
+      "end_seconds": 12.030000000000001,
+      "text": "my name is john garcia",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s4",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 13.09,
+      "end_seconds": 15.01,
+      "text": "i would like to reset my password",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s5",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 17.95,
+      "end_seconds": 20.29,
+      "text": "okay can you repeat the reason for your call please",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s6",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 22.76,
+      "end_seconds": 25.520000000000003,
+      "text": "i would like to reset my password",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s7",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 28.89,
+      "end_seconds": 30.27,
+      "text": "okay what is your phone number",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s8",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 32.22,
+      "end_seconds": 33.72,
+      "text": "seven one five",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s9",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 34.59,
+      "end_seconds": 36.0,
+      "text": "one three nine",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s10",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 36.88,
+      "end_seconds": 39.550000000000004,
+      "text": "zero seven eight seven",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s11",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 42.79,
+      "end_seconds": 44.5,
+      "text": "okay is there anything else i can help you with",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s12",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 46.39,
+      "end_seconds": 46.51,
+      "text": "[noise]",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s13",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 46.92,
+      "end_seconds": 49.71,
+      "text": "no that's all the help i needed today thank you",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s14",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 50.91,
+      "end_seconds": 52.68,
+      "text": "okay thank you for calling have a great day",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s15",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 54.98,
+      "end_seconds": 55.94,
+      "text": "you as well bye",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s16",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 55.49,
+      "end_seconds": 55.7,
+      "text": "okay",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s17",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 56.42,
+      "end_seconds": 57.32,
+      "text": "okay bye bye",
+      "confidence": null,
+      "channel": 2
+    }
+  ]
+}

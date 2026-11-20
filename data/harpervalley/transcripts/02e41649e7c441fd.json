@@ -1,0 +1,285 @@
+{
+  "call_id": "02e41649e7c441fd",
+  "source": "HarperValleyBank human-corrected transcript (CC BY 4.0)",
+  "language": "en",
+  "duration_seconds": 86.34,
+  "audio_channels": 1,
+  "transcription_provider": "dataset human transcript",
+  "transcription_model": "none",
+  "speaker_mapping": {
+    "agent": "agent",
+    "caller": "customer"
+  },
+  "segments": [
+    {
+      "segment_id": "s1",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 3.859,
+      "end_seconds": 3.979,
+      "text": "[noise]",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s2",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 4.609,
+      "end_seconds": 9.469000000000001,
+      "text": "hello this is harper valley national bank my name is robert how can i help you today",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s3",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 11.619,
+      "end_seconds": 13.869,
+      "text": "hi my name is jennifer williams",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s4",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 15.119,
+      "end_seconds": 16.019,
+      "text": "and um",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s5",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 16.789,
+      "end_seconds": 18.199,
+      "text": "i need a new checkbook",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s6",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 21.519,
+      "end_seconds": 24.488999999999997,
+      "text": "sure i'd be happy to help you with that and what is your address",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s7",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 25.979,
+      "end_seconds": 30.058999999999997,
+      "text": "my address is zero zero one",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s8",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 32.129,
+      "end_seconds": 32.219,
+      "text": "mhm",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s9",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 32.589,
+      "end_seconds": 35.049,
+      "text": "main that's m a i n",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s10",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 35.789,
+      "end_seconds": 36.659,
+      "text": "[noise] okay",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s11",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 36.289,
+      "end_seconds": 37.039,
+      "text": "street",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s12",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 39.419,
+      "end_seconds": 41.788999999999994,
+      "text": "and that's in forest ranch",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s13",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 43.289,
+      "end_seconds": 44.279,
+      "text": "california",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s14",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 46.219,
+      "end_seconds": 49.999,
+      "text": "and the zip code is seven zero zero",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s15",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 50.789,
+      "end_seconds": 52.199,
+      "text": "two three",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s16",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 54.659,
+      "end_seconds": 54.839,
+      "text": "[noise]",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s17",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 55.819,
+      "end_seconds": 59.539,
+      "text": "i got everything up until california can you repeat that zip code again please",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s18",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 60.319,
+      "end_seconds": 61.939,
+      "text": "sure i'm sorry it's seven",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s19",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 62.649,
+      "end_seconds": 63.459,
+      "text": "zero",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s20",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 64.019,
+      "end_seconds": 64.739,
+      "text": "zero",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s21",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 65.419,
+      "end_seconds": 65.929,
+      "text": "two",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s22",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 66.789,
+      "end_seconds": 67.179,
+      "text": "three",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s23",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 69.919,
+      "end_seconds": 72.829,
+      "text": "alright a new checkbook has been sent to your home address",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s24",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 73.519,
+      "end_seconds": 75.019,
+      "text": "is there anything else i can help you with",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s25",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 76.219,
+      "end_seconds": 78.37899999999999,
+      "text": "no that'll be all thank you very much",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s26",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 79.279,
+      "end_seconds": 80.719,
+      "text": "thank you for calling have a great day",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s27",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 81.789,
+      "end_seconds": 82.839,
+      "text": "you too bye",
+      "confidence": null,
+      "channel": 1
+    }
+  ]
+}

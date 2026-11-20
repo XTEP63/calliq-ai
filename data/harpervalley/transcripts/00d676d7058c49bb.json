@@ -1,0 +1,175 @@
+{
+  "call_id": "00d676d7058c49bb",
+  "source": "HarperValleyBank human-corrected transcript (CC BY 4.0)",
+  "language": "en",
+  "duration_seconds": 52.4,
+  "audio_channels": 1,
+  "transcription_provider": "dataset human transcript",
+  "transcription_model": "none",
+  "speaker_mapping": {
+    "agent": "agent",
+    "caller": "customer"
+  },
+  "segments": [
+    {
+      "segment_id": "s1",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 0.89,
+      "end_seconds": 1.34,
+      "text": "[noise]",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s2",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 1.69,
+      "end_seconds": 6.699999999999999,
+      "text": "hello this is happy valley national bank my name is jennifer how can i help you today",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s3",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 7.82,
+      "end_seconds": 12.11,
+      "text": "hi my name is robert johnson i would like to transfer money between my accounts",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s4",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 12.99,
+      "end_seconds": 14.52,
+      "text": "oh sure i can help you with that",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s5",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 15.02,
+      "end_seconds": 16.73,
+      "text": "uh what is the transfer amount",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s6",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 18.17,
+      "end_seconds": 21.290000000000003,
+      "text": "uh the amount is one hundred and thirty five dollars",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s7",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 22.52,
+      "end_seconds": 24.5,
+      "text": "okay what is the source of the account",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s8",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 25.83,
+      "end_seconds": 26.549999999999997,
+      "text": "savings",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s9",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 28.12,
+      "end_seconds": 30.220000000000002,
+      "text": "and what is the destination account",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s10",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 31.42,
+      "end_seconds": 31.900000000000002,
+      "text": "checking",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s11",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 33.29,
+      "end_seconds": 33.86,
+      "text": "okay",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s12",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 35.69,
+      "end_seconds": 44.69,
+      "text": "so uh one hundred and thirty five dollars has been transferred from your savings account to your checking account is there anything else i can help you with",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s13",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 45.72,
+      "end_seconds": 46.41,
+      "text": "no thank you",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s14",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 47.59,
+      "end_seconds": 49.330000000000005,
+      "text": "thank you for calling have a great day",
+      "confidence": null,
+      "channel": 2
+    },
+    {
+      "segment_id": "s15",
+      "speaker_id": "caller",
+      "role": "customer",
+      "start_seconds": 50.22,
+      "end_seconds": 51.21,
+      "text": "you too bye bye",
+      "confidence": null,
+      "channel": 1
+    },
+    {
+      "segment_id": "s16",
+      "speaker_id": "agent",
+      "role": "agent",
+      "start_seconds": 52.19,
+      "end_seconds": 52.37,
+      "text": "bye",
+      "confidence": null,
+      "channel": 2
+    }
+  ]
+}
