@@ -8,7 +8,7 @@ The bundled fallback includes six **synthetic, manually authored** calls and pro
 
 ## Run locally
 
-Python 3.11–3.14 and FFmpeg/ffprobe are recommended. On Windows:
+Python 3.11–3.14 is recommended. FFmpeg is needed only to rebuild bundled audio samples, not to run the app. On Windows:
 
 ```powershell
 python -m venv .venv

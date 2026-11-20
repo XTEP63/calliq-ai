@@ -1,6 +1,7 @@
 import io
 import wave
 from datetime import date
+from pathlib import Path
 
 import pytest
 
@@ -32,6 +33,10 @@ def test_audio_validation():
     with pytest.raises(ValueError): inspect_audio(b"corrupt", "sample.wav")
     with pytest.raises(ValueError): inspect_audio(wav_bytes(2), "stereo.wav")
     with pytest.raises(ValueError): inspect_audio(wav_bytes(), "sample.pdf")
+    with pytest.raises(ValueError): inspect_audio(b"ID3not-a-real-audio-file", "broken.mp3")
+    sample = Path(__file__).parents[1] / "data/demo/audio/demo-escalation-06.mp3"
+    mp3_info = inspect_audio(sample.read_bytes(), sample.name)
+    assert mp3_info["channels"] == 1 and 20 < mp3_info["duration_seconds"] < 30
 
 
 def test_deepgram_normalization_and_roles():
