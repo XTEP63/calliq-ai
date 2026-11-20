@@ -6,9 +6,9 @@ Si el formato permite mostrar la app, abre [calliq-ai.streamlit.app](https://cal
 
 1. En **Overview**, pulsa **Explore a saved case**. El caso predeterminado es **Card replacement · Agent Maya · High priority**. Es sintético y sus hallazgos fueron escritos para la demo; no consume APIs.
 2. Reproduce unos segundos del audio. Muestra la prioridad, lee **The first finding to review** con sus segmentos citados y enseña la respuesta de coaching. Explica que el puntaje sale de un rubric calculado en Python, no de una cifra inventada por el modelo.
-4. Abre **Dashboards → Agent**, elige **Agent Maya** y enseña sus llamadas e historial. Luego ve a **Dashboards → Manager** para mostrar resumen por agente y temas repetidos.
-5. Ve a **Dashboards → QA Analyst** y selecciona la llamada marcada. Demuestra que una persona puede aprobar o corregir el hallazgo; las notas de la demo pública solo viven en esa sesión. Evita escribir datos privados.
-6. Ve a **Performance Reports**, selecciona **Agent Maya** y muestra la vista previa. El HTML se puede descargar; CallIQ no manda correos.
+3. Abre **Dashboards → Agent**, elige **Agent Maya** y enseña sus llamadas e historial. Luego ve a **Dashboards → Manager** para mostrar resumen por agente y temas repetidos.
+4. Ve a **Dashboards → QA Analyst** y selecciona la llamada marcada. Demuestra que una persona puede aprobar o corregir el hallazgo; las notas de la demo pública solo viven en esa sesión. Evita escribir datos privados.
+5. Ve a **Performance Reports**, selecciona **Agent Maya** y muestra la vista previa. El HTML se puede descargar; CallIQ no manda correos.
 
 Esta ruta es suficiente si el Wi-Fi del evento es lento, un proveedor falla o no quieres gastar créditos. Mantén abierta también la presentación PPTX en PowerPoint local.
 
