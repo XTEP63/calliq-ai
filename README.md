@@ -34,7 +34,7 @@ For experimental local inference, install `requirements-local.txt`, install [Oll
 
 ## Demo walkthrough
 
-For a presentation-ready sequence with a no-cost fallback, see the [demo-day guide](docs/demo-day-es.md). The [English slide deck](presentation/output/CallIQ-innovation-demo.pptx) and [two-presenter speech](presentation/SPEAKER_SCRIPT.md) are in the repository. The PowerPoint file includes speaker notes and research citations; [sources](presentation/SOURCES.md) list the public product pages behind the market comparison.
+For a presentation-ready sequence with a no-cost fallback, see the [demo-day guide](docs/demo-day-es.md). The [English slide deck](presentation/output/CallIQ-innovation-demo.pptx) and [solo speaker script](presentation/SPEAKER_SCRIPT.md) are in the repository. The PowerPoint tells the product story without a live demo and includes speaker notes; [sources](presentation/SOURCES.md) explain the research and claim boundaries.
 
 1. **Overview:** describe why sampled manual QA misses calls. Metrics are explicitly labeled as synthetic samples.
 2. **Analyze Call → Saved demonstration:** listen to `demo-balance-01` (strong), `demo-card-02` (critical issue), and `demo-escalation-06` (uncertain). Inspect exact transcript evidence, coverage, and coaching.

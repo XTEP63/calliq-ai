@@ -1,81 +1,83 @@
-# CallIQ presentation script
+# CallIQ — solo presentation script
 
-**Target length:** about 9 minutes, including a 90-second product demonstration. Two presenters can split the lines below. For a solo presentation, read both parts in sequence. Pause after the question on slide 2 and after the live demonstration.
+**Format:** one presenter, about 7–8 minutes. The slides tell the complete story without a live product demo. The card replacement example is a synthetic, manually prepared demonstration case in the current MVP; it is not a measured customer result or a live model response.
 
 ## Slide 1 — CallIQ
 
-**Presenter A:** Good morning. Imagine that your contact center handled thousands of conversations yesterday. How many of those conversations can your quality team actually review today?
+Good morning. I want to start with a simple question: if your contact center handled thousands of conversations yesterday, which of those conversations will actually change how your team works tomorrow?
 
-**Presenter B:** We built CallIQ to help teams turn calls into evidence, coaching, and a clear queue for human review. Our principle is simple: every call counts, and every insight should lead to action.
+CallIQ is an AI-assisted quality and coaching platform for contact centers. It turns a conversation into a reviewable finding, a practical coaching step, and a clearer priority for the QA team.
 
 ## Slide 2 — The blind spot
 
-**Presenter A:** Most quality programs rely on a small sample of manual reviews. The problem is not that reviewers lack skill. The problem is that listening, scoring, and documenting each call takes time. A randomly missed call can contain an avoidable process error or a coaching opportunity.
+Quality teams do valuable work, but listening to, scoring, and documenting a call takes time. So they often review a sample. A call outside that sample may contain a missed procedure, a customer concern, or a moment where an agent needed support.
 
-**Presenter B:** Our question was: can we help a QA team see where to look first, while keeping people accountable for the final decision?
+The opportunity is to help reviewers find the right conversations sooner and make each review more useful.
 
-## Slide 3 — Who feels the cost
+## Slide 3 — Three people, one gap
 
-**Presenter A:** The agent gets feedback late and often cannot connect it to a precise moment. The manager sees a team score but struggles to identify repeated behaviors. The QA analyst spends time finding the calls that deserve attention.
+Think about the three people around a call. An agent needs feedback tied to something they actually said. A manager needs to see repeated behavior across a team. A QA analyst needs to know which call deserves attention first.
 
-**Presenter B:** One conversation can affect all three people. CallIQ gives each of them a different view of the same evidence.
+They do not need three disconnected reports. They need different decisions grounded in the same conversation.
 
-## Slide 4 — One call, structured evidence
+## Slide 4 — The call
 
-**Presenter B:** Here is the workflow. We start with a mono recording or a verified transcript. Speech recognition returns timestamped turns. A person confirms which speaker is the agent. The language model classifies the call and proposes findings using segment IDs.
+Let me show you a small example. This is a synthetic card replacement conversation built into our demo. A customer says, “I lost my debit card and need a new one.” Maya replies that she can replace it and gives an arrival estimate. Then the customer asks what happens to the old card, and Maya ends the call with “It should stop working. Goodbye.”
 
-**Presenter A:** Then ordinary Python code validates those IDs and calculates the rubric score. That separation matters: the model explains what it sees, while deterministic rules calculate the score and flag critical findings.
+On a quick listen, this may sound like a routine service interaction. But the exact words matter. Where was identity verification? Was the old card actually blocked? Did the customer get a clear resolution? This is where a quality review becomes useful.
 
-## Slide 5 — Uncertainty stays visible
+## Slide 5 — What CallIQ would surface
 
-**Presenter B:** Consider a 25-second opening excerpt. We may hear the greeting and the customer request, but the recording ends before the agent can finish the procedure. We should not call the missing closing a confirmed failure.
+In this prepared demo review, CallIQ flags identity verification for human attention. The finding points to the opening and the replacement promise, where no verification is heard. It marks the procedure outcome as insufficient evidence: the call does not confirm that the old card was blocked. The closing is also weak.
 
-**Presenter A:** CallIQ marks those later steps as insufficient evidence and shows score coverage. If coverage is too low, it withholds the score. Human QA can then request the complete call.
+The preliminary score is 42.9 percent with 70 percent rubric coverage, and the call is placed at high QA priority. Those numbers are not the whole story. The value is that a reviewer can inspect the cited turns, confirm or correct the finding, and see exactly why the case rose to the top.
 
-## Slide 6 — Feedback becomes coaching
+## Slide 6 — Turn a finding into coaching
 
-**Presenter A:** A useful evaluation should help the next conversation, not just label the last one. CallIQ shows the transcript moment, the finding, a concrete alternative response, and a next step to practice.
+The next step is not simply telling Maya she failed. CallIQ suggests a response she can practice: “Before I process a replacement, I need to complete identity verification.”
 
-**Presenter B:** Across several calls, the agent view shows recurring opportunities. The manager view shows team patterns. The weekly report turns those patterns into coaching goals.
+That creates a practical loop. The agent sees a specific improvement. The manager can watch for the same behavior across calls. QA can spend time on the calls that need judgment. With more reviewed calls, a weekly report can summarize repeated coaching opportunities.
 
-## Slide 7 — Live product demonstration
+## Slide 7 — How the product works
 
-**Presenter B:** Let me show the reliable path. I will open the saved card replacement case. This is a synthetic demonstration case, so it loads instantly and makes no API request.
+Under the hood, the workflow is straightforward. Start with a recording or a transcript. Transcription produces speaker turns. A person confirms who the agent is. The evaluation proposes a call category and rubric findings with transcript segment IDs. Python checks those references and calculates the weighted score.
 
-**Presenter A:** Notice the high review priority. Open the identity verification finding and point to the exact cited turn. Then show the suggested correction. Move to the manager view to see the repeated topics and to the QA queue to see where a reviewer would start.
+That design keeps the evidence visible. If the recording is incomplete, CallIQ can mark a criterion as insufficient evidence and show score coverage. A human reviewer remains responsible for the final quality decision.
 
-**Presenter B:** If time and provider credits allow, we can also transcribe a public two-speaker recording live, confirm the agent, and request a new model evaluation. We will keep that optional because the main product story should not depend on network latency.
+## Slide 8 — Why CallIQ
 
-## Slide 8 — The market already validates the need
+Contact center analytics is an established category. NICE, CallMiner, and Observe.AI offer broad quality and coaching products. Our near-term entry point is deliberately focused: a transparent post-call QA workflow that a team can pilot against its own rubric.
 
-**Presenter A:** Established platforms such as NICE, CallMiner, and Observe.AI offer automated quality management, analytics, and coaching. Some also provide real-time guidance and broad channel coverage. This is an active category, not an empty market.
+What we want to prove is a connected chain: from a specific turn in a call, to a reviewable finding, to a coaching action, to a pattern across calls. We also designed the provider layer so transcription and language models can change as requirements change. Those choices support a controlled pilot; they are not a claim that this MVP has more features than mature suites.
 
-**Presenter B:** CallIQ is a focused pilot. Its current design emphasizes traceable transcript segments, visible uncertainty, deterministic rubric math, and provider adapters that can be exchanged. We are not claiming enterprise-scale coverage or a feature advantage over those mature suites today.
+## Slide 9 — What is real today
 
-## Slide 9 — What works today
+The MVP already supports saved synthetic cases, a public demo, a tested transcription and evaluation path, evidence checks, deterministic scoring, agent and manager views, a QA queue, and a weekly report preview.
 
-**Presenter B:** The MVP is public. We have a working upload and transcription path, speaker confirmation, structured evaluation, evidence checks, deterministic scoring, stakeholder views, and a weekly report preview. We also include ready-made synthetic cases and an attributed public corpus for a reliable demonstration.
+The next step before real customer data is equally clear: approved access controls, privacy and retention rules, calibration with human reviewers, and contact center integration. We want to measure the product in a safe, realistic setting before making enterprise claims.
 
-**Presenter A:** The live pipeline has been tested end to end on a public clip. The complete quality workflow still needs production controls before use with real customer data.
+## Slide 10 — The pilot
 
-## Slide 10 — The path to enterprise use
+So here is the pilot we propose: use an approved set of calls and an existing human QA baseline. Then ask three concrete questions. Can the team find important calls sooner? Do cited transcript moments make reviews faster and clearer? Does repeated coaching help agents improve over time?
 
-**Presenter B:** The next stage is a controlled pilot: agreed policy rubrics, calibration against human reviewers, measured precision and recall for QA flags, secure data handling, and integration with contact center systems.
-
-**Presenter A:** At enterprise scale we would add identity and role controls, tenant isolation, retention policies, and approved infrastructure. AI findings would remain advisory until a human reviewer confirms them.
+If we cannot show those changes, we will know what to fix. If we can, we will have evidence for the next stage of investment.
 
 ## Slide 11 — Close
 
-**Presenter A:** We are asking for a small, measured pilot with a QA team, not a blind rollout. Give us an approved set of calls and a reviewer baseline, and we can test whether CallIQ helps people find the right calls and coach the right behaviors.
+CallIQ starts with one conversation, but the goal is a stronger quality loop across the team. Every call can reveal something; the value comes when that insight helps a person make a better decision.
 
-**Presenter B:** CallIQ makes every reviewed call more useful. Thank you. We would be happy to take questions.
+We are asking for a small, human-reviewed pilot with a QA team and approved calls. Thank you. I would welcome your questions.
 
 ## Short answers for likely questions
 
-**Is the score generated by the LLM?** No. The LLM returns structured findings; Python applies rubric weights and calculates the score.
+**Did an AI model produce the example on slides 4–5?** No. It is a synthetic saved case with manually authored provisional findings. The separate live evaluation path has been tested, but the presentation does not depend on a network call.
 
-**What if the recording is incomplete?** CallIQ marks unobservable steps as insufficient evidence and shows coverage. An opening excerpt with low coverage is unscored.
+**Does the model set the score?** No. It proposes structured findings; Python validates evidence references and calculates rubric weights.
 
-**Is this ready for customer data?** No. The current public demo uses synthetic and public simulated calls. Production requires access controls, retention, privacy review, and QA calibration.
+**What if part of a recording is missing?** The reviewer sees insufficient-evidence criteria and score coverage. Low coverage can withhold a score.
 
-**How is this different from established suites?** Our near-term position is a transparent, modular pilot that can be adapted to a team's rubric and providers. We do not claim functionality the current MVP has not demonstrated.
+**Is the public MVP ready for real customer recordings?** No. Production use needs access controls, data-handling approval, human calibration, and monitoring.
+
+**How is CallIQ different from established suites?** The near-term proposition is an adaptable, evidence-first pilot focused on post-call QA and coaching. We would test its value against a human baseline rather than claim superiority without evidence.
+
+**What if a live demo is requested after the talk?** Open the saved synthetic card replacement case first. Only run a new transcription and evaluation if the format, connection, and approved provider credits permit it. This is optional and outside the slide narrative.
