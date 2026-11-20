@@ -129,18 +129,26 @@ elif page == "Analyze Call":
             st.warning("Live transcription needs DEEPGRAM_API_KEY. Saved demonstration cases remain available.")
         if not os.getenv("GROQ_API_KEY") and os.getenv("LLM_PROVIDER", "groq") == "groq":
             st.warning("Live evaluation needs GROQ_API_KEY. You can still inspect saved results.")
-        uploaded = st.file_uploader("Mono WAV or MP3 · up to 20 MB and 15 minutes · authorized recordings only", type=["wav", "mp3"])
-        if uploaded:
-            upload_id = hashlib.sha256(uploaded.getvalue()).hexdigest()
+        use_sample = st.checkbox("Use bundled 25-second two-speaker sample (HarperValleyBank, CC BY 4.0)")
+        if use_sample:
+            audio_file_name = "harper-live-25s.mp3"
+            audio_bytes = (Path("data/demo/audio") / audio_file_name).read_bytes()
+            st.caption("A short excerpt of the public HarperValleyBank card replacement call. Processing it makes fresh API requests.")
+        else:
+            uploaded = st.file_uploader("Mono WAV or MP3 · up to 20 MB and 15 minutes · authorized recordings only", type=["wav", "mp3"])
+            audio_file_name = uploaded.name if uploaded else None
+            audio_bytes = uploaded.getvalue() if uploaded else None
+        if audio_bytes:
+            upload_id = hashlib.sha256(audio_bytes).hexdigest()
             if st.session_state.get("upload_id") != upload_id:
                 st.session_state["upload_id"] = upload_id
                 st.session_state.pop("transcript", None)
                 st.session_state.pop("analysis", None)
-            st.audio(uploaded)
+            st.audio(audio_bytes, format="audio/mpeg" if audio_file_name.lower().endswith(".mp3") else "audio/wav")
             if st.button("1. Transcribe recording", type="primary"):
                 try:
                     with st.spinner("Validating and transcribing…"):
-                        transcript, source = transcribe_audio(uploaded.getvalue(), uploaded.name, store)
+                        transcript, source = transcribe_audio(audio_bytes, audio_file_name, store)
                     st.session_state["transcript"] = transcript
                     st.success(source)
                 except Exception as exc:
@@ -149,10 +157,16 @@ elif page == "Analyze Call":
             if transcript:
                 st.caption(f"Transcript: {transcript.transcription_provider} · {transcript.call_id}")
                 speakers = sorted({s.speaker_id for s in transcript.segments})
-                agent_speaker = st.selectbox("2. Confirm which speaker is the agent", speakers)
-                agent_alias = st.text_input("Agent alias", value="Uploaded agent")
-                st.caption("Diarization distinguishes voices but does not identify the agent. Local Faster-Whisper needs a separate diarization step; unknown roles require review.")
-                if st.button("3. Evaluate confirmed transcript"):
+                st.markdown("#### Review the transcript before assigning roles")
+                for segment in transcript.segments:
+                    st.markdown(f"**{segment.start_seconds:.1f}s · Speaker {segment.speaker_id} · {segment.segment_id}**  {segment.text}")
+                roles_uncertain = len(speakers) < 2 or "unknown" in speakers
+                if roles_uncertain:
+                    st.warning("This transcript does not distinguish two speakers. Agent quality cannot be evaluated reliably. Use a recording with distinct voices or the Manual transcript tab with confirmed roles.")
+                agent_speaker = st.selectbox("2. Confirm which speaker is the agent", speakers, disabled=roles_uncertain)
+                agent_alias = st.text_input("Agent alias", value="Uploaded agent", disabled=roles_uncertain)
+                st.caption("Diarization distinguishes voices but does not identify the agent. Confirm the mapping from the transcript and audio before evaluating.")
+                if st.button("3. Evaluate confirmed transcript", disabled=roles_uncertain):
                     try:
                         ready = confirm_roles(transcript, agent_speaker)
                         with st.spinner("Evaluating rubric and checking evidence…"):

@@ -4,7 +4,7 @@
 
 CallIQ is a Streamlit MVP for post-call contact center QA and agent coaching. It turns a mono recording or an existing transcript into a structured preliminary evaluation, checks every cited transcript segment, calculates a deterministic rubric score, and presents the result to agents, managers, and QA analysts.
 
-The bundled fallback includes six **synthetic, manually authored** calls and provisional QA findings. Four have synthetic text-to-speech MP3 recordings. The repository also includes eight selected calls from the public [Gridspace-Stanford HarperValleyBank dataset](https://github.com/cricketclub/gridspace-stanford-harper-valley), with its human-corrected transcripts and aligned mixed audio. The corpus has **no human-validated CallIQ QA scores**. Evaluating a corpus call requires a configured LLM.
+The bundled fallback includes six **synthetic, manually authored** calls and provisional QA findings. Four have synthetic text-to-speech MP3 recordings. The repository also includes eight selected calls from the public [Gridspace-Stanford HarperValleyBank dataset](https://github.com/cricketclub/gridspace-stanford-harper-valley), with its human-corrected transcripts and aligned mixed audio. A 25-second two-speaker excerpt is bundled for live processing tests. The corpus has **no human-validated CallIQ QA scores**. Evaluating a corpus call requires a configured LLM.
 
 ## Run locally
 
@@ -37,7 +37,7 @@ For experimental local inference, install `requirements-local.txt`, install [Oll
 1. **Overview:** describe why sampled manual QA misses calls. Metrics are explicitly labeled as synthetic samples.
 2. **Analyze Call → Saved demonstration:** listen to `demo-balance-01` (strong), `demo-card-02` (critical issue), and `demo-escalation-06` (uncertain). Inspect exact transcript evidence, coverage, and coaching.
 3. **Analyze Call → Public corpus:** play a HarperValleyBank call and inspect its human-corrected transcript. With a Groq key, evaluate it live.
-4. **Analyze Call → Upload and process:** upload authorized mono audio, transcribe, confirm speaker roles, then evaluate. If transcription fails, use **Manual transcript** with an authorized role-labeled transcript. These paths require LLM credentials; audio transcription also requires a transcription provider.
+4. **Analyze Call → Upload and process:** choose the bundled 25-second two-speaker sample or upload authorized mono audio, transcribe, inspect the diarized turns, confirm speaker roles, then evaluate. The TTS samples use one voice and are not suitable for testing diarization. If transcription fails, use **Manual transcript** with an authorized role-labeled transcript. These paths require LLM credentials; audio transcription also requires a transcription provider.
 5. **Agent Dashboard:** inspect an alias's call history and coaching.
 6. **Manager Dashboard:** compare aliases and recurring criteria.
 7. **QA Analyst:** review the priority queue and record a human decision. This is a demo workflow, not access control.
