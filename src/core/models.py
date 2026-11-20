@@ -34,7 +34,7 @@ class Transcript(BaseModel):
     source: str
     language: str = "en"
     duration_seconds: float = Field(ge=0)
-    audio_channels: int = Field(ge=1)
+    audio_channels: int | None = Field(default=None, ge=1)
     transcription_provider: str
     transcription_model: str
     speaker_mapping: dict[str, str] = Field(default_factory=dict)

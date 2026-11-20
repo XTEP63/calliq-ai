@@ -11,6 +11,7 @@ from src.evaluation.scoring import build_analysis
 from src.ingestion.audio import inspect_audio
 from src.storage.sqlite import Store
 from src.transcription.providers import assign_roles, normalize_deepgram
+from src.transcription.manual import parse_manual_transcript
 from src.services.pipeline import confirm_roles
 from src.services import pipeline
 
@@ -45,6 +46,17 @@ def test_deepgram_normalization_and_roles():
     assert confirm_roles(transcript, "0").segments[0].role == "agent"
     with pytest.raises(ValueError, match="cannot be confirmed"):
         confirm_roles(assign_roles(transcript, {"0": "agent", "1": "agent"}).model_copy(update={"segments": [transcript.segments[0]]}), "0")
+
+
+def test_manual_transcript_requires_real_roles_and_times():
+    transcript = parse_manual_transcript("0|1|agent|Hello\n1.2|3|customer|Please help | with my card")
+    assert transcript.audio_channels is None
+    assert transcript.segments[1].text == "Please help | with my card"
+    assert transcript.call_id.startswith("manual-")
+    for bad in ("0|1|agent|Hello", "0|1|agent|Hello\n1|2|unknown|Hi",
+                "2|3|agent|Hello\n1|2|customer|Hi", "nan|2|agent|Hello\n2|3|customer|Hi"):
+        with pytest.raises(ValueError):
+            parse_manual_transcript(bad)
 
 
 def test_scores_evidence_and_critical():

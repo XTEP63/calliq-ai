@@ -28,6 +28,8 @@ LLM_PROVIDER = "groq"
 
 The app accepts authorized English mono WAV/MP3 recordings up to 20 MB and 15 minutes. Live upload uses Deepgram Nova-3 with `diarize_model=latest`, asks the user to confirm the agent speaker, then evaluates using Groq `openai/gpt-oss-20b` with strict JSON schema output. The model returns judgments; Python validates evidence and computes scores. Missing keys produce visible errors and leave saved samples available. API quotas and charges depend on the provider account.
 
+If transcription is unavailable, **Analyze Call → Manual transcript** accepts authorized, role-labeled turns in `start|end|agent-or-customer|text` format. Times are supplied in seconds; CallIQ does not invent timestamps or roles. This path still needs an LLM key to generate a fresh evaluation.
+
 For experimental local inference, install `requirements-local.txt`, install [Ollama](https://ollama.com/) and pull `qwen3:4b`, then run `./start.ps1 -Local`. Faster-Whisper defaults to CPU `small.en` and `int8`; set `WHISPER_DEVICE=cuda` and an appropriate `WHISPER_COMPUTE_TYPE` only after verifying CTranslate2/CUDA compatibility. Local diarization is **not implemented**: its transcript uses an unknown speaker, so it is unsuitable for reliable agent scoring until roles are resolved. No large model is installed by the base requirements.
 
 ## Demo walkthrough
@@ -35,7 +37,7 @@ For experimental local inference, install `requirements-local.txt`, install [Oll
 1. **Overview:** describe why sampled manual QA misses calls. Metrics are explicitly labeled as synthetic samples.
 2. **Analyze Call → Saved demonstration:** listen to `demo-balance-01` (strong), `demo-card-02` (critical issue), and `demo-escalation-06` (uncertain). Inspect exact transcript evidence, coverage, and coaching.
 3. **Analyze Call → Public corpus:** play a HarperValleyBank call and inspect its human-corrected transcript. With a Groq key, evaluate it live.
-4. **Analyze Call → Upload and process:** upload authorized mono audio, transcribe, confirm speaker roles, then evaluate. This live path requires credentials.
+4. **Analyze Call → Upload and process:** upload authorized mono audio, transcribe, confirm speaker roles, then evaluate. If transcription fails, use **Manual transcript** with an authorized role-labeled transcript. These paths require LLM credentials; audio transcription also requires a transcription provider.
 5. **Agent Dashboard:** inspect an alias's call history and coaching.
 6. **Manager Dashboard:** compare aliases and recurring criteria.
 7. **QA Analyst:** review the priority queue and record a human decision. This is a demo workflow, not access control.

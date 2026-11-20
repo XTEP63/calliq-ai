@@ -14,6 +14,7 @@ from src.demo import seed_demo
 from src.evaluation.scoring import CRITERIA
 from src.services.pipeline import confirm_roles, evaluate_transcript, transcribe_audio
 from src.storage.sqlite import Store
+from src.transcription.manual import parse_manual_transcript
 
 st.set_page_config(page_title="CallIQ | Every Call Counts", page_icon="◉", layout="wide")
 
@@ -84,7 +85,7 @@ if page == "Overview":
 
 elif page == "Analyze Call":
     st.header("Analyze a conversation")
-    demo_tab, corpus_tab, upload_tab = st.tabs(["Saved demonstration", "Public corpus", "Upload and process"])
+    demo_tab, corpus_tab, upload_tab, manual_tab = st.tabs(["Saved demonstration", "Public corpus", "Upload and process", "Manual transcript"])
     with demo_tab:
         demos = [c for c in all_calls if c.origin.startswith("Synthetic")]
         chosen = st.selectbox("Synthetic sample", demos, format_func=lambda c: f"{c.call_id} · {c.primary_intent} · {c.agent_id} · {c.review_priority}")
@@ -162,6 +163,39 @@ elif page == "Analyze Call":
                         st.error(f"Evaluation failed: {exc}")
                 if st.session_state.get("analysis"):
                     result_view(st.session_state["analysis"])
+    with manual_tab:
+        st.caption("Fallback when transcription fails: enter an authorized English transcript with confirmed roles. One turn per line: start|end|agent-or-customer|text (times in seconds). No timestamps or roles are inferred.")
+        manual_text = st.text_area("Role-labeled transcript", height=200,
+                                   placeholder="0.0|2.5|agent|Thank you for calling. How may I help?\n2.6|4.0|customer|I need to check my balance.")
+        manual_id = hashlib.sha256(manual_text.encode("utf-8")).hexdigest()
+        if st.session_state.get("manual_id") != manual_id:
+            st.session_state["manual_id"] = manual_id
+            st.session_state.pop("manual_transcript", None)
+            st.session_state.pop("manual_analysis", None)
+        if st.button("Validate transcript"):
+            try:
+                st.session_state["manual_transcript"] = parse_manual_transcript(manual_text)
+                st.success("Transcript validated. Review the roles and words before requesting an AI evaluation.")
+            except ValueError as exc:
+                st.error(str(exc))
+        manual_transcript = st.session_state.get("manual_transcript")
+        if manual_transcript:
+            for segment in manual_transcript.segments:
+                st.markdown(f"**{segment.start_seconds:.1f}s · {segment.role.title()} · {segment.segment_id}**  {segment.text}")
+            manual_agent = st.text_input("Agent alias for this transcript", value="Manual transcript agent")
+            if not os.getenv("GROQ_API_KEY") and os.getenv("LLM_PROVIDER", "groq") == "groq":
+                st.warning("AI evaluation needs GROQ_API_KEY. The validated transcript remains available in this session.")
+            if st.button("Evaluate validated transcript"):
+                try:
+                    with st.spinner("Evaluating rubric and checking evidence…"):
+                        analysis, source = evaluate_transcript(manual_transcript, manual_agent, store,
+                                                               "Fresh evaluation of authorized manual transcript")
+                    st.session_state["manual_analysis"] = analysis
+                    st.success(source)
+                except Exception as exc:
+                    st.error(f"Evaluation failed: {exc}")
+            if st.session_state.get("manual_analysis"):
+                result_view(st.session_state["manual_analysis"])
 
 elif page == "Agent Dashboard":
     st.header("Agent dashboard")
