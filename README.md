@@ -34,17 +34,17 @@ For experimental local inference, install `requirements-local.txt`, install [Oll
 
 ## Demo walkthrough
 
-For a presentation-ready sequence with a no-cost fallback, see the [demo-day guide](docs/demo-day-es.md). The [English slide deck](presentation/output/CallIQ-innovation-demo.pptx) and [solo speaker script](presentation/SPEAKER_SCRIPT.md) are in the repository. The PowerPoint tells the product story without a live demo and includes speaker notes; [sources](presentation/SOURCES.md) explain the research and claim boundaries.
+For a presentation-ready sequence with a no-cost fallback, see the [demo-day guide](docs/demo-day-es.md). The [technology decisions and enterprise path](docs/technology-decisions.md) explains the MVP stack and options for a large contact-center estate. The [English slide deck](presentation/output/CallIQ-innovation-demo.pptx) and [solo speaker script](presentation/SPEAKER_SCRIPT.md) are in the repository. The PowerPoint tells the product story without a live demo and includes speaker notes; [sources](presentation/SOURCES.md) explain the research and claim boundaries.
 
 1. **Overview:** describe why sampled manual QA misses calls. Metrics are explicitly labeled as synthetic samples.
-2. **Analyze Call → Saved demonstration:** listen to `demo-balance-01` (strong), `demo-card-02` (critical issue), and `demo-escalation-06` (uncertain). Inspect exact transcript evidence, coverage, and coaching.
+2. **Analyze Call → Saved case:** listen to `demo-balance-01` (strong), `demo-card-02` (critical issue), and `demo-escalation-06` (uncertain). Inspect exact transcript evidence, coverage, and coaching.
 3. **Analyze Call → Public corpus:** play a HarperValleyBank call and inspect its human-corrected transcript. With a Groq key, evaluate it live.
-4. **Analyze Call → Upload and process:** choose the bundled 25-second two-speaker sample or upload authorized mono audio, transcribe, inspect the diarized turns, confirm speaker roles, then evaluate. The bundled clip is an opening excerpt: later steps remain unassessed, and CallIQ withholds its score if coverage is below 50%. The TTS samples use one voice and are not suitable for testing diarization. If transcription fails, use **Manual transcript** with an authorized role-labeled transcript. These paths require LLM credentials; audio transcription also requires a transcription provider.
-5. **Agent Dashboard:** inspect an alias's call history and coaching.
-6. **Manager Dashboard:** compare aliases and recurring criteria.
-7. **QA Analyst:** review the priority queue and record a human decision. This is a demo workflow, not access control.
+4. **Analyze Call → New audio analysis:** choose the bundled 25-second two-speaker sample or upload authorized mono audio, transcribe, inspect the diarized turns, confirm speaker roles, then evaluate. The bundled clip is an opening excerpt: later steps remain unassessed, and CallIQ withholds its score if coverage is below 50%. The TTS samples use one voice and are not suitable for testing diarization. If transcription fails, use **Manual transcript** with an authorized role-labeled transcript. These paths require LLM credentials; audio transcription also requires a transcription provider.
+5. **Dashboards → Agent:** inspect an alias's call history and coaching.
+6. **Dashboards → Manager:** compare aliases and recurring criteria.
+7. **Dashboards → QA Analyst:** review the priority queue and record a human decision. This is a demo workflow, not access control.
 8. **Performance Reports:** select dates, preview and download HTML. No email is sent.
-9. **Architecture & About:** explain the AWS migration path.
+9. **About:** explain the architecture and enterprise path.
 
 ## Architecture
 
