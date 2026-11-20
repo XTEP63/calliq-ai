@@ -26,9 +26,8 @@ La app pública es suficiente. Usa la alternativa local solo si ya la probaste e
 ```powershell
 cd C:\Users\esteb\apps\call-iq
 python -m venv .venv       # solo la primera vez
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt  # solo la primera vez
-.\start.ps1
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt  # solo la primera vez
+.\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
 Haz la instalación antes de la presentación, no frente al público. Abre `http://localhost:8501`. Así se ejecuta la misma app y los seis casos precargados funcionan sin claves. Para procesar una llamada nueva desde localhost debes configurar **en esa terminal** `DEEPGRAM_API_KEY` y `GROQ_API_KEY`; los Secrets de Streamlit Cloud no se copian a tu computadora. No pegues las claves en diapositivas, archivos versionados ni el chat.
