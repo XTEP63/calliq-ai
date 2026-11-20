@@ -64,6 +64,19 @@ CASES = [
 ]
 
 CRITERION_IDS = ["greeting", "identity", "understanding", "resolution", "closing"]
+EVIDENCE = {
+    "demo-balance-01": [[1], [3], [3], [5], [7]],
+    "demo-card-02": [[1], [1, 3], [3], [3, 5], [5]],
+    "demo-hours-03": [[1], [2], [3], [3], [7]],
+    "demo-payment-04": [[1], [3], [3], [5, 7], [7]],
+    "demo-transfer-05": [[1], [3], [3], [5], [7]],
+    "demo-escalation-06": [[1], [], [2], [4, 6], [6]],
+}
+COACHING = {
+    "demo-card-02": ("Verify before replacing a card", "Before I process a replacement, I need to complete identity verification.", "Rehearse the verification step before account changes."),
+    "demo-payment-04": ("Confirm payment details", "I have scheduled [verified amount] for [verified date]. Does that match your request?", "Confirm amount and date before ending payment calls."),
+    "demo-escalation-06": ("Explain the escalation follow-up", "I will confirm how and when the disputes team will contact you before we finish.", "Give a verified next step and timeframe."),
+}
 
 
 def demo_analyses():
@@ -81,17 +94,18 @@ def demo_analyses():
                                 segments=segments)
         findings = []
         for idx, (criterion, status) in enumerate(zip(CRITERION_IDS, statuses)):
-            evidence = [segments[min(idx, len(segments)-1)].segment_id]
+            evidence = [segments[j-1].segment_id for j in EVIDENCE[call_id][idx]]
             explanation = f"Synthetic demo review: {criterion.replace('_', ' ')} is {status.lower().replace('_', ' ')}. {reason}"
             findings.append(CriterionFinding(criterion_id=criterion, status=Status(status), explanation=explanation,
                                              evidence_segment_ids=evidence,
                                              suggested_correction="Confirm this step explicitly with the customer." if status == "FAIL" else ""))
         fail = next((f for f in findings if f.status == Status.FAIL), None)
-        coaching = [Coaching(title="Make the next step explicit" if fail else "Maintain clear confirmation",
+        title, example, step = COACHING.get(call_id, ("Maintain clear confirmation", "Have I fully answered your question today?", "Keep confirming the outcome before closing."))
+        coaching_evidence = fail.evidence_segment_ids if fail and fail.evidence_segment_ids else [segments[-1].segment_id]
+        coaching = [Coaching(title=title,
                              why_it_matters=reason,
-                             example_response="Let me confirm the exact next step and timeframe before we finish." if fail else "Have I fully answered your question today?",
-                             next_step="Practice a complete closing in the next call." if fail else "Keep confirming the outcome before closing.",
-                             evidence_segment_ids=fail.evidence_segment_ids if fail else [segments[-1].segment_id])]
+                             example_response=example, next_step=step,
+                             evidence_segment_ids=coaching_evidence)]
         judgment = LLMJudgment(primary_intent=intent, classification_reason=reason, findings=findings, coaching=coaching)
         analysis = build_analysis(transcript, judgment, agent_id=agent, origin="Synthetic saved demonstration",
                                   llm_provider="none - manually authored demo", llm_model="none")

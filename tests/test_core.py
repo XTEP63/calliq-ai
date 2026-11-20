@@ -53,6 +53,8 @@ def test_scores_evidence_and_critical():
     assert cases[2].score == 100  # identity is not applicable for public branch hours
     assert cases[1].critical_failure and cases[1].review_priority == "High"
     assert cases[-1].score_coverage < 100
+    assert cases[-1].findings[-1].evidence_segment_ids == ["s6"]
+    assert cases[0].findings[-1].evidence_segment_ids == ["s7"]
     judgment = LLMJudgment(primary_intent=cases[0].primary_intent,
                            classification_reason="test", findings=[f.model_copy(deep=True) for f in cases[0].findings],
                            coaching=cases[0].coaching)
