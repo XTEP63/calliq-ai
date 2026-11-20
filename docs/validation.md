@@ -1,9 +1,10 @@
 # Validation record
 
 - Environment: Windows 11, Python 3.14.3, Git 2.53.0, FFmpeg available.
-- `python -m pytest -q`: 6 passed (2026-11-19). This includes manual transcript validation and public-session isolation.
-- Streamlit `AppTest`: Overview, Analyze Call, Agent Dashboard, Manager Dashboard, QA Analyst, Performance Reports, and Architecture & About loaded without script exceptions (2026-11-19).
+- `python -m pytest -q`: 8 passed (2026-11-19). Tests include manual transcript validation, public-session isolation, and safeguards for short excerpts and uncited failures.
+- Streamlit `AppTest` loaded all seven views without exceptions after the excerpt-scoring correction, with a visitor analysis injected into session state. The sandbox run stalled while opening a local asyncio socket; the same test passed when run with local socket access.
 - Four synthetic MP3 recordings generated using Windows System.Speech and FFmpeg. Eight public corpus calls prepared with source attribution.
 - Streamlit Community Cloud deployed from `XTEP63/calliq-ai` main. `https://calliq-ai.streamlit.app/` opened and rendered Overview, saved analysis with corrected transcript evidence, the public corpus, Manager Dashboard, QA Analyst queue, and report preview. An independent HTTP request without browser cookies returned 200 (2026-11-19).
-- Live Deepgram/Groq processing was not exercised because API keys were absent. Upload UI shows the missing-key messages. No paid API requests were made.
-- Manual transcript fallback tab loads in Streamlit `AppTest` without exceptions. Live provider verification remains pending until the newly configured Secrets are checked and API usage is authorized.
+- The live public-site flow was verified with user-configured Secrets and authorized provider usage. The 25-second HarperValleyBank clip produced a timestamped Deepgram Nova-3 transcript with two speakers. After confirming speaker 0 as agent, Groq `openai/gpt-oss-20b` returned structured card-replacement findings, evidence references, and coaching. Python scoring and result rendering succeeded.
+- That live test exposed a quality issue: the model labeled later steps as failures despite the clip ending at 25 seconds. The subsequent code marks the clip as an opening excerpt, treats identity, resolution, and closing outcomes as insufficient evidence, and withholds a score below 50% coverage. This correction is covered by an automated test; it has not triggered another paid provider request.
+- New analyses are included in Agent, Manager, QA, and report views within the visitor's Streamlit session. Tests check that a visitor's result does not appear in another visitor's collection. Persistent multiuser storage and role-based access remain future work.

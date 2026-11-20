@@ -13,6 +13,7 @@ from src.core.models import Transcript
 from src.demo import seed_demo
 from src.evaluation.scoring import CRITERIA
 from src.services.pipeline import confirm_roles, evaluate_transcript, transcribe_audio
+from src.services.session import visible_analyses
 from src.storage.sqlite import Store
 from src.transcription.manual import parse_manual_transcript
 
@@ -31,14 +32,14 @@ st.markdown("""<style>
 
 store = Store(os.getenv("CALLIQ_DB_PATH", "data/calliq.sqlite3"))
 seed_demo(store)
-all_calls = store.list()
+all_calls = visible_analyses(store.list(), st.session_state.get("session_analyses", {}))
 
 st.markdown('<div class="hero"><span class="badge">CONTACT CENTER INTELLIGENCE</span><h1>CallIQ</h1><p>Every Call Counts. Every Insight Matters.</p></div>', unsafe_allow_html=True)
 st.caption("Preliminary AI assessments support human QA. Demo views do not enforce access control. Synthetic examples are labeled throughout.")
 
 page = st.sidebar.radio("Workspace", ["Overview", "Analyze Call", "Agent Dashboard", "Manager Dashboard", "QA Analyst", "Performance Reports", "Architecture & About"])
 st.sidebar.divider()
-st.sidebar.caption(f"{len(all_calls)} saved evaluations · {sum(c.origin.startswith('Synthetic') for c in all_calls)} synthetic demos")
+st.sidebar.caption(f"{len(all_calls)} visible evaluations · {sum(c.origin.startswith('Synthetic') for c in all_calls)} synthetic demos")
 
 
 def result_view(call):
@@ -49,6 +50,8 @@ def result_view(call):
     m3.metric("Review priority", call.review_priority)
     m4.metric("Primary intent", call.primary_intent)
     st.caption("Scores use only assessable criteria. Unknown outcomes reduce coverage, not the score denominator.")
+    if call.transcript.recording_scope == "opening_excerpt":
+        st.info("Opening excerpt only. Later steps are unassessed, and a score is withheld when coverage is below 50%.")
     if call.review_reason != "Routine sampling": st.warning(call.review_reason)
     st.markdown("#### Transcript")
     by_id = {segment.segment_id: segment for segment in call.transcript.segments}
@@ -76,10 +79,10 @@ if page == "Overview":
     st.write("CallIQ transcribes a conversation, applies a configurable QA rubric, verifies cited evidence, and turns findings into coaching and review priorities.")
     stats = summarize(all_calls)
     a, b, c = st.columns(3)
-    a.metric("Saved calls", stats["calls"])
+    a.metric("Visible calls", stats["calls"])
     b.metric("Average assessable score", f"{stats['average_score']}%" if stats["average_score"] is not None else "—")
     c.metric("Flagged for QA", stats["flagged"])
-    st.caption("These metrics include explicitly synthetic demonstration cases. They are not production KPIs.")
+    st.caption("These metrics include synthetic demonstration cases and any evaluations in this browser session. They are not production KPIs.")
     st.subheader("Demonstration path")
     st.write("Open **Analyze Call** to inspect a saved case or upload mono WAV/MP3. Continue through agent coaching, team metrics, QA review, and a report preview.")
 
@@ -118,6 +121,7 @@ elif page == "Analyze Call":
                             with st.spinner("Evaluating the public corpus transcript…"):
                                 analysis, source = evaluate_transcript(transcript, agent_id, store, "Fresh evaluation of public corpus transcript")
                             st.session_state.setdefault("corpus_analyses", {})[entry["call_id"]] = analysis
+                            st.session_state.setdefault("session_analyses", {})[analysis.call_id] = analysis
                             st.success(source)
                             result_view(analysis)
                         except Exception as exc:
@@ -133,7 +137,7 @@ elif page == "Analyze Call":
         if use_sample:
             audio_file_name = "harper-live-25s.mp3"
             audio_bytes = (Path("data/demo/audio") / audio_file_name).read_bytes()
-            st.caption("A short excerpt of the public HarperValleyBank card replacement call. Processing it makes fresh API requests.")
+            st.caption("Opening excerpt of a public HarperValleyBank card replacement call. Later QA steps cannot be judged from this clip. Processing it makes fresh API requests.")
         else:
             uploaded = st.file_uploader("Mono WAV or MP3 · up to 20 MB and 15 minutes · authorized recordings only", type=["wav", "mp3"])
             audio_file_name = uploaded.name if uploaded else None
@@ -149,6 +153,8 @@ elif page == "Analyze Call":
                 try:
                     with st.spinner("Validating and transcribing…"):
                         transcript, source = transcribe_audio(audio_bytes, audio_file_name, store)
+                    if use_sample:
+                        transcript = transcript.model_copy(update={"recording_scope": "opening_excerpt", "source": "HarperValleyBank 25-second opening excerpt"})
                     st.session_state["transcript"] = transcript
                     st.success(source)
                 except Exception as exc:
@@ -172,6 +178,7 @@ elif page == "Analyze Call":
                         with st.spinner("Evaluating rubric and checking evidence…"):
                             analysis, source = evaluate_transcript(ready, agent_alias, store)
                         st.session_state["analysis"] = analysis
+                        st.session_state.setdefault("session_analyses", {})[analysis.call_id] = analysis
                         st.success(source)
                     except Exception as exc:
                         st.error(f"Evaluation failed: {exc}")
@@ -205,6 +212,7 @@ elif page == "Analyze Call":
                         analysis, source = evaluate_transcript(manual_transcript, manual_agent, store,
                                                                "Fresh evaluation of authorized manual transcript")
                     st.session_state["manual_analysis"] = analysis
+                    st.session_state.setdefault("session_analyses", {})[analysis.call_id] = analysis
                     st.success(source)
                 except Exception as exc:
                     st.error(f"Evaluation failed: {exc}")
@@ -228,7 +236,7 @@ elif page == "Agent Dashboard":
 
 elif page == "Manager Dashboard":
     st.header("Manager dashboard")
-    st.caption("Synthetic demonstration team. Agent aliases represent only these sample scripts.")
+    st.caption("Synthetic sample agents and evaluations from this browser session. Agent aliases are demonstration labels.")
     for agent in sorted({c.agent_id for c in all_calls}):
         calls = [c for c in all_calls if c.agent_id == agent]
         stats = summarize(calls)

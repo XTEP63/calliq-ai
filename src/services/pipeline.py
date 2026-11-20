@@ -38,7 +38,7 @@ def transcribe_audio(data: bytes, filename: str, store: Store) -> tuple[Transcri
 def evaluate_transcript(transcript: Transcript, agent_id: str, store: Store, origin: str = "Fresh live analysis") -> tuple[Analysis, str]:
     provider = os.getenv("LLM_PROVIDER", "groq")
     model = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b") if provider == "groq" else os.getenv("OLLAMA_MODEL", "qwen3:4b")
-    key = _key(transcript.model_dump(mode="json"), provider, model, "evaluation-v1", "banking-v1", agent_id, origin)
+    key = _key(transcript.model_dump(mode="json"), provider, model, "evaluation-v2", "banking-v1", agent_id, origin)
     persist = os.getenv("APP_MODE", "online") == "local"
     cached = store.cache_get(key, "analysis") if persist else None
     if cached:

@@ -4,7 +4,7 @@
 
 CallIQ is a Streamlit MVP for post-call contact center QA and agent coaching. It turns a mono recording or an existing transcript into a structured preliminary evaluation, checks every cited transcript segment, calculates a deterministic rubric score, and presents the result to agents, managers, and QA analysts.
 
-The bundled fallback includes six **synthetic, manually authored** calls and provisional QA findings. Four have synthetic text-to-speech MP3 recordings. The repository also includes eight selected calls from the public [Gridspace-Stanford HarperValleyBank dataset](https://github.com/cricketclub/gridspace-stanford-harper-valley), with its human-corrected transcripts and aligned mixed audio. A 25-second two-speaker excerpt is bundled for live processing tests. The corpus has **no human-validated CallIQ QA scores**. Evaluating a corpus call requires a configured LLM.
+The bundled fallback includes six **synthetic, manually authored** calls and provisional QA findings. Four have synthetic text-to-speech MP3 recordings. The repository also includes eight selected calls from the public [Gridspace-Stanford HarperValleyBank dataset](https://github.com/cricketclub/gridspace-stanford-harper-valley), with its human-corrected transcripts and aligned mixed audio. A 25-second two-speaker opening excerpt is bundled for live processing tests. The corpus has **no human-validated CallIQ QA scores**. Evaluating a corpus call requires a configured LLM.
 
 ## Run locally
 
@@ -37,7 +37,7 @@ For experimental local inference, install `requirements-local.txt`, install [Oll
 1. **Overview:** describe why sampled manual QA misses calls. Metrics are explicitly labeled as synthetic samples.
 2. **Analyze Call → Saved demonstration:** listen to `demo-balance-01` (strong), `demo-card-02` (critical issue), and `demo-escalation-06` (uncertain). Inspect exact transcript evidence, coverage, and coaching.
 3. **Analyze Call → Public corpus:** play a HarperValleyBank call and inspect its human-corrected transcript. With a Groq key, evaluate it live.
-4. **Analyze Call → Upload and process:** choose the bundled 25-second two-speaker sample or upload authorized mono audio, transcribe, inspect the diarized turns, confirm speaker roles, then evaluate. The TTS samples use one voice and are not suitable for testing diarization. If transcription fails, use **Manual transcript** with an authorized role-labeled transcript. These paths require LLM credentials; audio transcription also requires a transcription provider.
+4. **Analyze Call → Upload and process:** choose the bundled 25-second two-speaker sample or upload authorized mono audio, transcribe, inspect the diarized turns, confirm speaker roles, then evaluate. The bundled clip is an opening excerpt: later steps remain unassessed, and CallIQ withholds its score if coverage is below 50%. The TTS samples use one voice and are not suitable for testing diarization. If transcription fails, use **Manual transcript** with an authorized role-labeled transcript. These paths require LLM credentials; audio transcription also requires a transcription provider.
 5. **Agent Dashboard:** inspect an alias's call history and coaching.
 6. **Manager Dashboard:** compare aliases and recurring criteria.
 7. **QA Analyst:** review the priority queue and record a human decision. This is a demo workflow, not access control.
@@ -59,9 +59,9 @@ flowchart LR
     J[Bundled synthetic and public samples] --> I
 ```
 
-Rubric `banking-v1` assigns 10% greeting, 25% identity verification when applicable, 20% understanding, 30% resolution, and 15% closing. `NOT_APPLICABLE` is removed from the denominator. `INSUFFICIENT_EVIDENCE` is excluded from the score calculation and reduces displayed score coverage. Critical failures are flagged independently. A finding with an unknown segment ID is rejected. All AI outputs are preliminary and need human QA before consequential use.
+Rubric `banking-v1` assigns 10% greeting, 25% identity verification when applicable, 20% understanding, 30% resolution, and 15% closing. `NOT_APPLICABLE` is removed from the denominator. `INSUFFICIENT_EVIDENCE` is excluded from the score calculation and reduces displayed score coverage. For the bundled opening excerpt, later-step outcomes become insufficient evidence; scores below 50% coverage are withheld. Critical failures are flagged independently. A finding with an unknown segment ID is rejected, and an uncited pass or failure becomes insufficient evidence. All AI outputs are preliminary and need human QA before consequential use.
 
-In `APP_MODE=local`, SQLite stores evaluations, separate transcription/evaluation caches, and QA review history. Cache keys include audio hash or full transcript, provider/model, prompt and rubric versions, and agent alias. In the default online mode, uploaded calls, generated evaluations, and human review notes stay in the current Streamlit browser session, so visitors do not see each other's content through a shared SQLite file. Bundled sample data reloads on startup. A production deployment needs external storage and user authentication.
+In `APP_MODE=local`, SQLite stores evaluations, separate transcription/evaluation caches, and QA review history. Cache keys include audio hash or full transcript, provider/model, prompt and rubric versions, and agent alias. In the default online mode, uploaded calls, generated evaluations, and human review notes stay in the current Streamlit browser session and appear across its dashboards and reports, so visitors do not see each other's content through a shared SQLite file. Bundled sample data reloads on startup. A production deployment needs external storage and user authentication.
 
 ## Dataset and attribution
 
@@ -74,7 +74,7 @@ python -m pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
-Tests cover audio validation, Deepgram normalization, speaker mapping, deterministic scoring, evidence rejection, critical flags, SQLite, caching, and reports. Streamlit's `AppTest` can check all seven views. Actual Deepgram/Groq responses require credentials and have not been represented by mocks as live results.
+Tests cover audio validation, Deepgram normalization, speaker mapping, deterministic scoring, evidence rejection, short excerpts, session isolation, critical flags, SQLite, caching, and reports. Streamlit's `AppTest` checked all seven views after the latest quality fix with a visitor analysis in session state. A live Deepgram/Groq flow was verified on the deployed app; see [validation record](docs/validation.md).
 
 ## Deployment
 
@@ -93,7 +93,7 @@ The modular Python pipeline can migrate to S3 uploads, Step Functions orchestrat
 
 ## Current limits
 
-- Live online calls have not been verified without user-provided provider keys.
+- The live provider flow was verified once, before the excerpt-scoring safeguard. The safeguard is covered by automated tests and has not incurred another provider call.
 - Local Faster-Whisper/Ollama adapters are experimental; local diarization is pending.
 - QA corrections are audited as decisions/notes but do not yet change scores.
 - Streamlit Community Cloud storage is temporary without an external database.

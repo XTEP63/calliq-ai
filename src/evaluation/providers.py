@@ -31,9 +31,14 @@ def _messages(transcript: Transcript) -> list[dict]:
         "Use only transcript evidence. Return one finding per rubric criterion; use exact segment IDs. "
         "Never infer that identity verification is required for general information. "
         "Use INSUFFICIENT_EVIDENCE for unclear events and NOT_APPLICABLE for irrelevant steps. "
+        "An opening excerpt may stop before verification, resolution, or closing. Leave those later steps as INSUFFICIENT_EVIDENCE. "
+        "For recordings of unknown completeness, treat missing later steps as uncertain unless the agent clearly ended the call. "
+        "Every PASS or FAIL must cite at least one exact transcript segment supporting the outcome. "
         "Do not judge accent or customer frustration as agent failures. Give concrete, evidence-based coaching. "
+        "Do not invent bank policies, verification methods, delivery times, or facts about actions outside the recording. "
+        "Use placeholders in example responses when policy details are unknown. "
         "Do not make numerical scores. Respond only with the requested JSON schema.")},
-        {"role": "user", "content": json.dumps({"rubric": RUBRIC, "transcript": lines})}]
+        {"role": "user", "content": json.dumps({"rubric": RUBRIC, "recording_scope": transcript.recording_scope, "transcript": lines})}]
 
 
 def groq_evaluate(transcript: Transcript) -> LLMJudgment:

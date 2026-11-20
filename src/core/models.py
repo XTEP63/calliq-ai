@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from enum import StrEnum
+from typing import Literal
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -32,6 +33,7 @@ class Segment(BaseModel):
 class Transcript(BaseModel):
     call_id: str
     source: str
+    recording_scope: Literal["unknown", "full", "opening_excerpt"] = "unknown"
     language: str = "en"
     duration_seconds: float = Field(ge=0)
     audio_channels: int | None = Field(default=None, ge=1)
@@ -87,6 +89,6 @@ class Analysis(BaseModel):
     review_reason: str
     transcript: Transcript
     rubric_version: str = "banking-v1"
-    prompt_version: str = "evaluation-v1"
+    prompt_version: str = "evaluation-v2"
     llm_provider: str
     llm_model: str

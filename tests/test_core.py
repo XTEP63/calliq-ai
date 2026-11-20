@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 
 from src.analytics.reports import report_html, summarize
-from src.core.models import LLMJudgment, Transcript
+from src.core.models import LLMJudgment, Status, Transcript
 from src.demo import demo_analyses
 from src.evaluation.scoring import build_analysis
 from src.ingestion.audio import inspect_audio
@@ -14,6 +14,8 @@ from src.storage.sqlite import Store
 from src.transcription.providers import assign_roles, normalize_deepgram
 from src.transcription.manual import parse_manual_transcript
 from src.services.pipeline import confirm_roles
+from src.services.session import visible_analyses
+from src.evaluation.providers import _messages
 from src.services import pipeline
 
 
@@ -110,3 +112,36 @@ def test_public_mode_does_not_share_live_analysis(tmp_path, monkeypatch):
     monkeypatch.setenv("APP_MODE", "local")
     pipeline.evaluate_transcript(sample.transcript, "Visitor agent", store)
     assert store.get(sample.call_id) is not None
+
+
+def test_opening_excerpt_does_not_invent_later_failures():
+    sample = demo_analyses()[0]
+    transcript = sample.transcript.model_copy(update={"recording_scope": "opening_excerpt"})
+    findings = [f.model_copy(deep=True) for f in sample.findings]
+    for finding in findings:
+        if finding.criterion_id in {"identity", "resolution", "closing"}:
+            finding.status = Status.FAIL
+            finding.evidence_segment_ids = ["s1"]
+    judgment = LLMJudgment(primary_intent="Card replacement", classification_reason="card lost",
+                           findings=findings, coaching=[])
+    analysis = build_analysis(transcript, judgment, agent_id="test", origin="test",
+                              llm_provider="test", llm_model="test")
+    assert analysis.score is None and analysis.score_coverage == 30
+    assert not analysis.critical_failure and analysis.review_priority == "Medium"
+    assert all(f.status == Status.INSUFFICIENT_EVIDENCE for f in analysis.findings if f.criterion_id in {"identity", "resolution", "closing"})
+    assert "opening_excerpt" in _messages(transcript)[1]["content"]
+
+
+def test_uncited_failure_is_uncertain_and_session_results_are_isolated():
+    sample = demo_analyses()[1]
+    findings = [f.model_copy(deep=True) for f in sample.findings]
+    findings[1].evidence_segment_ids = []
+    judgment = LLMJudgment(primary_intent=sample.primary_intent, classification_reason="test",
+                           findings=findings, coaching=[])
+    analysis = build_analysis(sample.transcript, judgment, agent_id="test", origin="test",
+                              llm_provider="test", llm_model="test")
+    assert analysis.findings[1].status == Status.INSUFFICIENT_EVIDENCE
+    visitor_a = visible_analyses([sample], {"new": analysis})
+    visitor_b = visible_analyses([sample], {})
+    assert len(visitor_a) == 1 and visitor_a[0].agent_id == "test"
+    assert visitor_b == [sample]
